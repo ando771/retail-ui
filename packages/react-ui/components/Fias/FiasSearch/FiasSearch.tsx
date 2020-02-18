@@ -4,7 +4,7 @@ import warning from 'warning';
 import { FiasLocale, FiasLocaleHelper } from '../locale';
 import { FiasComboBox, FiasComboBoxProps } from '../Form/FiasComboBox';
 import { AddressResponse, APIProvider, Fields, SearchOptions } from '../types';
-import { locale } from '../../LocaleProvider/decorators';
+import { locale } from '../../Locale/decorators';
 import { filterProps } from '../../filterProps';
 
 import { Address } from '..';

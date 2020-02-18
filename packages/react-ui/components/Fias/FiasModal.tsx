@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '../Button';
 import { Gapped } from '../Gapped';
 import { Modal } from '../Modal';
-import { locale } from '../LocaleProvider/decorators';
+import { locale } from '../Locale/decorators';
 
 import { FiasLocale, FiasLocaleHelper } from './locale';
 

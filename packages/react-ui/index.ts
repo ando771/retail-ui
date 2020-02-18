@@ -18,6 +18,7 @@ export * from './components/Input';
 export * from './components/Kebab';
 export * from './components/Link';
 export * from './components/Loader';
+export * from './components/Locale';
 export * from './components/LocaleProvider';
 export * from './components/Logotype';
 export * from './components/Menu';

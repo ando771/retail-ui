@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Gapped } from '../../Gapped';
 import { Button } from '../../Button';
-import { locale } from '../../LocaleProvider/decorators';
+import { locale } from '../../Locale/decorators';
 import { FiasLocale, FiasLocaleHelper } from '../locale';
 import {
   AddressResponse,

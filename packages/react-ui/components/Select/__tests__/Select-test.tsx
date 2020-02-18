@@ -1,8 +1,8 @@
 import { mount } from 'enzyme';
 import React from 'react';
 
-import { defaultLangCode } from '../../LocaleProvider/constants';
-import { LangCodes, LocaleProvider } from '../../LocaleProvider';
+import { defaultLangCode } from '../../Locale/constants';
+import { LangCodes, LocaleContext } from '../../Locale';
 import { SelectLocaleHelper } from '../locale';
 import { Select } from '../Select';
 
@@ -73,9 +73,9 @@ describe('Select', () => {
 
     it('render default locale', () => {
       const wrapper = mount(
-        <LocaleProvider>
+        <LocaleContext.Provider value={{ langCode: defaultLangCode }}>
           <Select />
-        </LocaleProvider>,
+        </LocaleContext.Provider>,
       );
       const expectedText = SelectLocaleHelper.get(defaultLangCode).placeholder;
 
@@ -84,9 +84,9 @@ describe('Select', () => {
 
     it('render correct locale when set langCode', () => {
       const wrapper = mount(
-        <LocaleProvider langCode={LangCodes.en_GB}>
+        <LocaleContext.Provider value={{ langCode: LangCodes.en_GB }}>
           <Select />
-        </LocaleProvider>,
+        </LocaleContext.Provider>,
       );
       const expectedText = SelectLocaleHelper.get(LangCodes.en_GB).placeholder;
 
@@ -96,13 +96,13 @@ describe('Select', () => {
     it('render custom locale', () => {
       const customPlaceholder = 'custom loading';
       const wrapper = mount(
-        <LocaleProvider
-          locale={{
-            Select: { placeholder: customPlaceholder },
-          }}
+        <LocaleContext.Provider value={{
+          langCode: defaultLangCode,
+          locale: { Select: { placeholder: customPlaceholder }}
+        }}
         >
           <Select />
-        </LocaleProvider>,
+        </LocaleContext.Provider>,
       );
 
       expect(wrapper.text()).toBe(customPlaceholder);
@@ -110,13 +110,13 @@ describe('Select', () => {
 
     it('updates when langCode changes', () => {
       const wrapper = mount(
-        <LocaleProvider langCode={LangCodes.en_GB}>
+        <LocaleContext.Provider value={{ langCode: LangCodes.en_GB }}>
           <Select />
-        </LocaleProvider>,
+        </LocaleContext.Provider>,
       );
       const expectedText = SelectLocaleHelper.get(LangCodes.ru_RU).placeholder;
 
-      wrapper.setProps({ langCode: LangCodes.ru_RU });
+      wrapper.setProps({ value: { langCode: LangCodes.ru_RU }});
 
       expect(wrapper.text()).toBe(expectedText);
     });

@@ -7,7 +7,7 @@ import { cx } from '../../lib/theming/Emotion';
 import { Theme } from '../../lib/theming/Theme';
 import { DatePickerLocale, DatePickerLocaleHelper } from '../DatePicker/locale';
 import { InputLikeText } from '../internal/InputLikeText';
-import { locale } from '../LocaleProvider/decorators';
+import { locale } from '../Locale/decorators';
 import { ThemeConsumer } from '../ThemeConsumer';
 import { CalendarIcon } from '../internal/icons/16px';
 

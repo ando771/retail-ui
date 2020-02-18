@@ -6,9 +6,10 @@ import { InternalDateOrder, InternalDateSeparator } from '../../../lib/date/type
 import { Button } from '../../Button';
 import { Gapped } from '../../Gapped';
 import { MockDate } from '../../internal/MockDate';
-import { LangCodes, LocaleProvider } from '../../LocaleProvider';
 import { Tooltip } from '../../Tooltip';
 import { DatePicker } from '../DatePicker';
+import { LocaleContext, LangCodes } from '../../Locale';
+import { defaultLangCode } from '../../Locale/constants';
 
 class DatePickerWithError extends React.Component<any, any> {
   public state = {
@@ -25,7 +26,10 @@ class DatePickerWithError extends React.Component<any, any> {
           render={() => 'Такой даты не существует'}
           onCloseClick={this.removeTooltip}
         >
-          <LocaleProvider locale={{ DatePicker: { order: InternalDateOrder.MDY } }}>
+          <LocaleContext.Provider value={{
+            langCode: defaultLangCode,
+            locale: { DatePicker: { order: InternalDateOrder.MDY } }
+          }}>
             <DatePicker
               {...this.props}
               disabled={this.props.disabled}
@@ -39,7 +43,7 @@ class DatePickerWithError extends React.Component<any, any> {
               onBlur={this.validate}
               enableTodayLink
             />
-          </LocaleProvider>
+          </LocaleContext.Provider>
         </Tooltip>
         <Button onClick={() => this.setState({ value: null, error: null, tooltip: false })}>Clear</Button>
         <Button onClick={() => this.setState({ value: '99.99.9999' })}>Set &quot;99.99.9999&quot;</Button>
@@ -107,7 +111,10 @@ class DatePickerWithMinMax extends React.Component<any, any> {
             onChange={e => this.setState({ max: e.target.value })}
           />
         </label>
-        <LocaleProvider locale={{ DatePicker: { order: this.state.order, separator: this.state.separator } }}>
+        <LocaleContext.Provider value={{
+          langCode: defaultLangCode,
+          locale: { DatePicker: { order: this.state.order, separator: this.state.separator }}
+        }}>
           <DatePicker
             width={200}
             value={this.state.value}
@@ -115,7 +122,7 @@ class DatePickerWithMinMax extends React.Component<any, any> {
             maxDate={this.state.max}
             onValueChange={action('change')}
           />
-        </LocaleProvider>
+        </LocaleContext.Provider>
       </Gapped>
     );
   }
@@ -158,7 +165,7 @@ storiesOf('DatePicker', module)
   .add('DatePicker LocaleProvider', () => {
     return (
       <div style={{ paddingTop: 200 }}>
-        <LocaleProvider langCode={LangCodes.en_GB}>
+        <LocaleContext.Provider value={{ langCode: LangCodes.en_GB }}>
           <DatePicker
             value="02.07.2017"
             minDate="02.07.2017"
@@ -166,7 +173,7 @@ storiesOf('DatePicker', module)
             onValueChange={action('change')}
             enableTodayLink={true}
           />
-        </LocaleProvider>
+        </LocaleContext.Provider>
       </div>
     );
   });

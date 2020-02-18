@@ -2,8 +2,8 @@ import { mount, ReactWrapper } from 'enzyme';
 import React from 'react';
 
 import { emptyHandler } from '../../../lib/utils';
-import { defaultLangCode } from '../../LocaleProvider/constants';
-import { LangCodes, LocaleProvider } from '../../LocaleProvider';
+import { defaultLangCode } from '../../Locale/constants';
+import { LangCodes, LocaleContext } from '../../Locale';
 import { PagingLocaleHelper } from '../locale';
 import { Paging } from '../Paging';
 import PagingStyles from '../Paging.less';
@@ -155,14 +155,14 @@ describe('Pager', () => {
     });
 
     it('render default locale', () => {
-      wrapper = mount(<LocaleProvider>{PagingContext()}</LocaleProvider>);
+      wrapper = mount(<LocaleContext.Provider value={{ langCode: defaultLangCode }}>{PagingContext()}</LocaleContext.Provider>);
       const expectedText = PagingLocaleHelper.get(defaultLangCode).forward;
 
       expect(getForwardText()).toBe(expectedText);
     });
 
     it('render default locale', () => {
-      wrapper = mount(<LocaleProvider langCode={LangCodes.en_GB}>{PagingContext()}</LocaleProvider>);
+      wrapper = mount(<LocaleContext.Provider value={{ langCode: LangCodes.en_GB }}>{PagingContext()}</LocaleContext.Provider>);
       const expectedText = PagingLocaleHelper.get(LangCodes.en_GB).forward;
 
       expect(getForwardText()).toBe(expectedText);
@@ -171,17 +171,20 @@ describe('Pager', () => {
     it('render custom locale', () => {
       const customPlaceholder = 'custom forward';
       wrapper = mount(
-        <LocaleProvider locale={{ Paging: { forward: customPlaceholder } }}>{PagingContext()}</LocaleProvider>,
+        <LocaleContext.Provider value={{
+          langCode: defaultLangCode,
+          locale:{  Paging: { forward: customPlaceholder } }
+        }}>{PagingContext()}</LocaleContext.Provider>,
       );
 
       expect(getForwardText()).toBe(customPlaceholder);
     });
 
     it('updates when langCode changes', () => {
-      wrapper = mount(<LocaleProvider langCode={LangCodes.en_GB}>{PagingContext()}</LocaleProvider>);
+      wrapper = mount(<LocaleContext.Provider value={{ langCode: LangCodes.en_GB }}>{PagingContext()}</LocaleContext.Provider>);
       const expectedText = PagingLocaleHelper.get(LangCodes.ru_RU).forward;
 
-      wrapper.setProps({ langCode: LangCodes.ru_RU });
+      wrapper.setProps({ value: { langCode: LangCodes.ru_RU }});
 
       expect(getForwardText()).toBe(expectedText);
     });

@@ -1,4 +1,4 @@
-import { LangCodes } from '../../components/LocaleProvider';
+import { LangCodes } from '../../components/Locale';
 
 export enum InternalDateOrder {
   DMY = 'DMY',
