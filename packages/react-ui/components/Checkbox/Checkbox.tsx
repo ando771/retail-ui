@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 import { Nullable, Override } from '../../typings/utility-types';
 import { tabListener } from '../../lib/events/tabListener';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
-import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../ThemeContext';
 import { OkIcon, SquareIcon } from '../internal/icons/16px';
 import { isEdge, isFirefox, isIE11 } from '../../lib/utils';
 
@@ -57,13 +56,14 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
     onMouseLeave: PropTypes.func,
     onMouseOver: PropTypes.func,
   };
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
 
   public state = {
     focusedByTab: false,
     indeterminate: this.props.initialIndeterminate || false,
   };
 
-  private theme!: Theme;
   private input: Nullable<HTMLInputElement>;
 
   public componentDidMount = () => {
@@ -78,34 +78,19 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
     }
   }
 
-  public render() {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
   /**
    * @public
    */
   public focus() {
     tabListener.isTabPressed = true;
-    if (this.input) {
-      this.input.focus();
-    }
+    this.input?.focus();
   }
 
   /**
    * @public
    */
   public blur() {
-    if (this.input) {
-      this.input.blur();
-    }
+    this.input?.blur();
   }
 
   /**
@@ -134,7 +119,8 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
     }
   };
 
-  private renderMain() {
+  public render() {
+    const theme = this.context;
     const props = this.props;
     const {
       children,
@@ -152,21 +138,21 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
     } = props;
     const isIndeterminate = this.state.indeterminate;
 
-    const rootClass = cx(classes.root, jsStyles.root(this.theme), {
+    const rootClass = cx(classes.root, jsStyles.root(theme), {
       [jsStyles.rootFallback()]: isIE11 || isEdge,
       [classes.disabled]: !!props.disabled,
-      [jsStyles.disabled(this.theme)]: !!props.disabled,
-      [jsStyles.checked(this.theme)]: !!props.checked,
-      [jsStyles.indeterminate(this.theme)]: isIndeterminate,
-      [jsStyles.focus(this.theme)]: this.state.focusedByTab,
-      [jsStyles.warning(this.theme)]: !!props.warning,
-      [jsStyles.error(this.theme)]: !!props.error,
+      [jsStyles.disabled(theme)]: !!props.disabled,
+      [jsStyles.checked(theme)]: !!props.checked,
+      [jsStyles.indeterminate(theme)]: isIndeterminate,
+      [jsStyles.focus(theme)]: this.state.focusedByTab,
+      [jsStyles.warning(theme)]: !!props.warning,
+      [jsStyles.error(theme)]: !!props.error,
     });
 
     const inputProps = {
       ...rest,
       type: 'checkbox',
-      className: jsStyles.input(this.theme),
+      className: jsStyles.input(theme),
       onChange: this.handleChange,
       onFocus: this.handleFocus,
       onBlur: this.handleBlur,
@@ -175,7 +161,7 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
 
     let caption = null;
     if (children) {
-      const captionClass = cx(jsStyles.caption(this.theme), {
+      const captionClass = cx(jsStyles.caption(theme), {
         [jsStyles.captionIE11()]: isIE11 || isEdge,
       });
       caption = <span className={captionClass}>{children}</span>;
@@ -187,7 +173,7 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
     });
 
     const box = (
-      <span className={cx(classes.box, jsStyles.box(this.theme))}>
+      <span className={cx(classes.box, jsStyles.box(theme))}>
         {(isIndeterminate && <SquareIcon className={iconClass} />) || <OkIcon className={iconClass} />}
       </span>
     );
@@ -214,9 +200,7 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
   };
 
   private handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (this.props.onBlur) {
-      this.props.onBlur(e);
-    }
+    this.props.onBlur?.(e);
     this.setState({ focusedByTab: false });
   };
 
@@ -226,14 +210,10 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
 
   private handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.currentTarget.checked;
-    if (this.props.onValueChange) {
-      this.props.onValueChange(checked);
-    }
+    this.props.onValueChange?.(checked);
 
     this.resetIndeterminate();
 
-    if (this.props.onChange) {
-      this.props.onChange(event);
-    }
+    this.props.onChange?.(event);
   };
 }

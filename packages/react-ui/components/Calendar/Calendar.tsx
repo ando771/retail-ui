@@ -3,9 +3,8 @@ import normalizeWheel from 'normalize-wheel';
 
 import { MAX_DATE, MAX_MONTH, MAX_YEAR, MIN_DATE, MIN_MONTH, MIN_YEAR } from '../../lib/date/constants';
 import { Nullable } from '../../typings/utility-types';
-import { Theme } from '../../lib/theming/Theme';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
+import { ThemeContext } from '../ThemeContext';
 
 import { config } from './config';
 import * as CalendarUtils from './CalendarUtils';
@@ -64,8 +63,9 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
       date: MAX_DATE,
     },
   };
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
 
-  private theme!: Theme;
   private wheelEndTimeout: Nullable<number>;
   private root: Nullable<HTMLElement>;
   private animation = Animation();
@@ -91,17 +91,6 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
     if (this.animation.inProgress()) {
       this.animation.cancel();
     }
-  }
-
-  public render() {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
   }
 
   /**
@@ -209,10 +198,11 @@ export class Calendar extends React.Component<CalendarProps, CalendarState> {
     }
   };
 
-  private renderMain() {
+  public render() {
+    const theme = this.context;
     const positions = this.getMonthPositions();
     return (
-      <div ref={this.refRoot} className={cx(styles.root, jsStyles.root(this.theme))}>
+      <div ref={this.refRoot} className={cx(styles.root, jsStyles.root(theme))}>
         <div style={wrapperStyle} className={styles.wrapper}>
           {this.state.months
             .map<[number, MonthViewModel]>((x, i) => [positions[i], x])

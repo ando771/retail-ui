@@ -6,8 +6,7 @@ import { isMenuItem, MenuItem, MenuItemProps } from '../MenuItem';
 import { isMenuHeader } from '../MenuHeader';
 import { Nullable } from '../../typings/utility-types';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
-import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../ThemeContext';
 
 import { jsStyles } from './Menu.styles';
 import styles from './Menu.module.less';
@@ -35,29 +34,19 @@ export class Menu extends React.Component<MenuProps, MenuState> {
     hasShadow: true,
     preventWindowScroll: true,
   };
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
 
   public state = {
     highlightedIndex: -1,
   };
 
-  private theme!: Theme;
   private scrollContainer: Nullable<ScrollContainer>;
   private highlighted: Nullable<MenuItem>;
   private unmounted = false;
 
   public componentWillUnmount() {
     this.unmounted = true;
-  }
-
-  public render() {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
   }
 
   /**
@@ -99,7 +88,7 @@ export class Menu extends React.Component<MenuProps, MenuState> {
     this.highlight(index);
   }
 
-  private renderMain() {
+  public render() {
     const enableIconPadding = React.Children.toArray(this.props.children).some(
       x => React.isValidElement(x) && x.props.icon,
     );
@@ -107,10 +96,11 @@ export class Menu extends React.Component<MenuProps, MenuState> {
     if (this.isEmpty()) {
       return null;
     }
+    const theme = this.context;
 
     return (
       <div
-        className={cx(styles.root, jsStyles.root(this.theme), this.props.hasShadow && jsStyles.shadow(this.theme))}
+        className={cx(styles.root, jsStyles.root(theme), this.props.hasShadow && jsStyles.shadow(theme))}
         style={{ width: this.props.width, maxHeight: this.props.maxHeight }}
       >
         <ScrollContainer

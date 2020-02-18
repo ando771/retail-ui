@@ -9,8 +9,7 @@ import { DropdownContainer } from '../DropdownContainer';
 import * as LayoutEvents from '../../lib/LayoutEvents';
 import { Nullable } from '../../typings/utility-types';
 import { cx } from '../../lib/theming/Emotion';
-import { Theme } from '../../lib/theming/Theme';
-import { ThemeConsumer } from '../ThemeConsumer';
+import { ThemeContext } from '../ThemeContext';
 import { ArrowTriangleDownIcon, ArrowTriangleUpDownIcon, ArrowTriangleUpIcon } from '../internal/icons/16px';
 
 import { jsStyles } from './DateSelect.styles';
@@ -70,6 +69,8 @@ export class DateSelect extends React.Component<DateSelectProps, DateSelectState
     maxMonth: 11,
     width: 'auto',
   };
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
 
   public state = {
     botCapped: false,
@@ -82,7 +83,6 @@ export class DateSelect extends React.Component<DateSelectProps, DateSelectState
     nodeTop: Infinity,
   };
 
-  private theme!: Theme;
   private readonly locale!: DatePickerLocale;
   private root: HTMLElement | null = null;
   private itemsContainer: HTMLElement | null = null;
@@ -149,22 +149,12 @@ export class DateSelect extends React.Component<DateSelectProps, DateSelectState
   };
 
   public render() {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
-  private renderMain() {
+    const theme = this.context;
     const { width, disabled } = this.props;
     const rootProps = {
       className: cx({
         [styles.root]: true,
-        [jsStyles.root(this.theme)]: true,
+        [jsStyles.root(theme)]: true,
         [styles.disabled]: !!disabled,
       }),
       style: { width },
@@ -177,7 +167,7 @@ export class DateSelect extends React.Component<DateSelectProps, DateSelectState
           <div
             className={cx({
               [styles.arrow]: true,
-              [jsStyles.arrow(this.theme)]: true,
+              [jsStyles.arrow(theme)]: true,
               [styles.arrowDisabled]: !!disabled,
             })}
           >
@@ -223,6 +213,7 @@ export class DateSelect extends React.Component<DateSelectProps, DateSelectState
 
   private renderMenu(): React.ReactNode {
     const { top, height, nodeTop } = this.state;
+    const theme = this.context;
 
     let shift = this.state.pos % itemHeight;
     if (shift < 0) {
@@ -237,11 +228,11 @@ export class DateSelect extends React.Component<DateSelectProps, DateSelectState
       const disableItems = this.disableItems(i) || false;
       const className = cx({
         [styles.menuItem]: true,
-        [jsStyles.menuItem(this.theme)]: true,
-        [jsStyles.menuItemSelected(this.theme)]: i === 0,
-        [jsStyles.menuItemActive(this.theme)]: i === this.state.current,
+        [jsStyles.menuItem(theme)]: true,
+        [jsStyles.menuItemSelected(theme)]: i === 0,
+        [jsStyles.menuItemActive(theme)]: i === this.state.current,
         [styles.menuItemDisabled]: disableItems,
-        [jsStyles.menuItemDisabled(this.theme)]: disableItems,
+        [jsStyles.menuItemDisabled(theme)]: disableItems,
       });
       const clickHandler = {
         onMouseDown: preventDefault,
@@ -277,7 +268,7 @@ export class DateSelect extends React.Component<DateSelectProps, DateSelectState
 
     const holderClass = cx({
       [styles.menuHolder]: true,
-      [jsStyles.menuHolder(this.theme)]: true,
+      [jsStyles.menuHolder(theme)]: true,
       [styles.isTopCapped]: this.state.topCapped,
       [styles.isBotCapped]: this.state.botCapped,
     });
@@ -295,7 +286,7 @@ export class DateSelect extends React.Component<DateSelectProps, DateSelectState
             <div className={holderClass} style={style}>
               {!this.state.topCapped && (
                 <div
-                  className={cx(styles.menuUp, jsStyles.menuUp(this.theme))}
+                  className={cx(styles.menuUp, jsStyles.menuUp(theme))}
                   onClick={this.handleUp}
                   onMouseDown={this.handleLongClickUp}
                   onMouseUp={this.handleLongClickStop}
@@ -315,7 +306,7 @@ export class DateSelect extends React.Component<DateSelectProps, DateSelectState
               </div>
               {!this.state.botCapped && (
                 <div
-                  className={cx(styles.menuDown, jsStyles.menuDown(this.theme))}
+                  className={cx(styles.menuDown, jsStyles.menuDown(theme))}
                   onClick={this.handleDown}
                   onMouseDown={this.handleLongClickDown}
                   onMouseUp={this.handleLongClickStop}

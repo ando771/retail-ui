@@ -38,7 +38,6 @@ export * from './components/Sticky';
 export * from './components/Switcher';
 export * from './components/Tabs';
 export * from './components/Textarea';
-export * from './components/ThemeConsumer';
 export * from './components/ThemeProvider';
 export * from './components/Toast';
 export * from './components/Toggle';

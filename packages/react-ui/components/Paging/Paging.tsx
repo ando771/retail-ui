@@ -7,8 +7,7 @@ import { Nullable } from '../../typings/utility-types';
 import { tabListener } from '../../lib/events/tabListener';
 import { emptyHandler, isIE11 } from '../../lib/utils';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
-import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../ThemeContext';
 import { ArrowChevronRightIcon } from '../internal/icons/16px';
 
 import { jsStyles } from './Paging.styles';
@@ -74,6 +73,8 @@ export class Paging extends React.Component<PagingProps, PagingState> {
   };
 
   public static propTypes = {};
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
 
   public static isForward(pageNumber: number | 'forward'): boolean /* %checks */ {
     return pageNumber === 'forward';
@@ -85,7 +86,6 @@ export class Paging extends React.Component<PagingProps, PagingState> {
     keyboardControl: this.props.useGlobalListener,
   };
 
-  private theme!: Theme;
   private readonly locale!: PagingLocale;
   private addedGlobalListener = false;
   private container: HTMLSpanElement | null = null;
@@ -121,17 +121,6 @@ export class Paging extends React.Component<PagingProps, PagingState> {
 
   public render() {
     return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
-  private renderMain() {
-    return (
       <span
         tabIndex={0}
         className={styles.paging}
@@ -162,21 +151,23 @@ export class Paging extends React.Component<PagingProps, PagingState> {
   };
 
   private renderDots = (key: string) => {
+    const theme = this.context;
     return (
-      <span key={key} className={cx(styles.dots, jsStyles.dots(this.theme))}>
+      <span key={key} className={cx(styles.dots, jsStyles.dots(theme))}>
         {'...'}
       </span>
     );
   };
 
   private renderForwardLink = (disabled: boolean, focused: boolean): JSX.Element => {
+    const theme = this.context;
     const classes = cx({
       [styles.forwardLink]: true,
-      [jsStyles.forwardLink(this.theme)]: true,
+      [jsStyles.forwardLink(theme)]: true,
       [styles.focused]: focused,
-      [jsStyles.focused(this.theme)]: focused,
+      [jsStyles.focused(theme)]: focused,
       [styles.disabled]: disabled,
-      [jsStyles.disabled(this.theme)]: disabled,
+      [jsStyles.disabled(theme)]: disabled,
     });
     const { component: Component, caption } = this.props;
     const { forward } = this.locale;
@@ -199,13 +190,14 @@ export class Paging extends React.Component<PagingProps, PagingState> {
   };
 
   private renderPageLink = (pageNumber: number, active: boolean, focused: boolean): JSX.Element => {
+    const theme = this.context;
     const classes = cx({
       [styles.pageLink]: true,
-      [jsStyles.pageLink(this.theme)]: true,
+      [jsStyles.pageLink(theme)]: true,
       [styles.focused]: focused,
-      [jsStyles.focused(this.theme)]: focused,
+      [jsStyles.focused(theme)]: focused,
       [styles.active]: active,
-      [jsStyles.active(this.theme)]: active,
+      [jsStyles.active(theme)]: active,
     });
     const Component = this.props.component;
     const handleClick = () => this.goToPage(pageNumber);
@@ -225,13 +217,14 @@ export class Paging extends React.Component<PagingProps, PagingState> {
       return null;
     }
 
+    const theme = this.context;
     const { keyboardControl } = this.state;
     const canGoBackward = this.canGoBackward();
     const canGoForward = this.canGoForward();
 
     if (keyboardControl && (canGoBackward || canGoForward)) {
       return (
-        <span className={cx(styles.pageLinkHint, jsStyles.pageLinkHint(this.theme))}>
+        <span className={cx(styles.pageLinkHint, jsStyles.pageLinkHint(theme))}>
           <span className={canGoBackward ? '' : styles.transparent}>{'←'}</span>
           <span>{NavigationHelper.getKeyName()}</span>
           <span className={canGoForward ? '' : styles.transparent}>{'→'}</span>

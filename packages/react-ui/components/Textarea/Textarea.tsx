@@ -7,8 +7,7 @@ import { polyfillPlaceholder } from '../polyfillPlaceholder';
 import * as LayoutEvents from '../../lib/LayoutEvents';
 import { Nullable, Override } from '../../typings/utility-types';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
-import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../ThemeContext';
 
 import { getTextAreaHeight } from './TextareaHelpers';
 import { jsStyles } from './Textarea.styles';
@@ -133,13 +132,14 @@ export class Textarea extends React.Component<TextareaProps, TextareaState> {
     rows: 3,
     maxRows: 15,
   };
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
 
   public state = {
     polyfillPlaceholder,
     rows: 1,
   };
 
-  private theme!: Theme;
   private node: Nullable<HTMLTextAreaElement>;
   private fakeNode: Nullable<HTMLTextAreaElement>;
   private layoutEvents: Nullable<{ remove: () => void }>;
@@ -163,33 +163,18 @@ export class Textarea extends React.Component<TextareaProps, TextareaState> {
     }
   }
 
-  public render() {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
   /**
    * @public
    */
   public focus() {
-    if (this.node) {
-      this.node.focus();
-    }
+    this.node?.focus();
   }
 
   /**
    * @public
    */
   public blur() {
-    if (this.node) {
-      this.node.blur();
-    }
+    this.node?.blur();
   }
 
   /**
@@ -216,7 +201,8 @@ export class Textarea extends React.Component<TextareaProps, TextareaState> {
     }
   };
 
-  private renderMain() {
+  public render() {
+    const theme = this.context;
     const {
       width = DEFAULT_WIDTH,
       error,
@@ -242,9 +228,9 @@ export class Textarea extends React.Component<TextareaProps, TextareaState> {
 
     const textareaClassNames = cx({
       [styles.textarea]: true,
-      [jsStyles.textarea(this.theme)]: true,
-      [jsStyles.error(this.theme)]: !!error,
-      [jsStyles.warning(this.theme)]: !!warning,
+      [jsStyles.textarea(theme)]: true,
+      [jsStyles.error(theme)]: !!error,
+      [jsStyles.warning(theme)]: !!warning,
     });
 
     const textAreaStyle = {
@@ -269,7 +255,7 @@ export class Textarea extends React.Component<TextareaProps, TextareaState> {
     }
 
     return (
-      <label {...rootProps} className={cx(styles.root, jsStyles.root(this.theme))}>
+      <label {...rootProps} className={cx(styles.root, jsStyles.root(theme))}>
         {placeholderPolyfill}
         <textarea
           {...textareaProps}
@@ -365,9 +351,7 @@ export class Textarea extends React.Component<TextareaProps, TextareaState> {
       this.autoResize();
     }
 
-    if (this.props.onPaste) {
-      this.props.onPaste(event);
-    }
+    this.props.onPaste?.(event);
   };
 
   private handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -375,9 +359,7 @@ export class Textarea extends React.Component<TextareaProps, TextareaState> {
       this.autoResize();
     }
 
-    if (this.props.onCut) {
-      this.props.onCut(event);
-    }
+    this.props.onCut?.(event);
   };
 
   private handleFocus = (event: React.FocusEvent<HTMLTextAreaElement>) => {
@@ -385,8 +367,6 @@ export class Textarea extends React.Component<TextareaProps, TextareaState> {
       this.selectAll();
     }
 
-    if (this.props.onFocus) {
-      this.props.onFocus(event);
-    }
+    this.props.onFocus?.(event);
   };
 }

@@ -26,8 +26,7 @@ import { createPropsGetter } from '../internal/createPropsGetter';
 import { Nullable } from '../../typings/utility-types';
 import { isFunction } from '../../lib/utils';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
-import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../ThemeContext';
 
 import { Item } from './Item';
 import { SelectLocale, SelectLocaleHelper } from './locale';
@@ -200,6 +199,9 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
     use: 'default',
   };
 
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
+
   public static Item = Item;
   public static SEP = () => <MenuSeparator />;
 
@@ -216,7 +218,6 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
     value: this.props.defaultValue,
   };
 
-  private theme!: Theme;
   private readonly locale!: SelectLocale;
   private menu: Nullable<Menu>;
   private buttonElement: FocusableReactElement | null = null;
@@ -231,27 +232,13 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
     }
   }
 
-  public render() {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
   /**
    * @public
    */
   public open = () => {
     if (!this.state.opened) {
       this.setState({ opened: true });
-
-      if (this.props.onOpen) {
-        this.props.onOpen();
-      }
+      this.props.onOpen?.();
     }
   };
 
@@ -261,10 +248,7 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
   public close = () => {
     if (this.state.opened) {
       this.setState({ opened: false });
-
-      if (this.props.onClose) {
-        this.props.onClose();
-      }
+      this.props.onClose?.();
     }
   };
 
@@ -272,12 +256,10 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
    * @public
    */
   public focus = () => {
-    if (this.buttonElement && this.buttonElement.focus) {
-      this.buttonElement.focus();
-    }
+    this.buttonElement?.focus?.();
   };
 
-  private renderMain() {
+  public render() {
     const { label, isPlaceholder } = this.renderLabel();
 
     const buttonParams: ButtonParams = {
@@ -331,6 +313,8 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
   }
 
   private renderDefaultButton(params: ButtonParams) {
+    const theme = this.context;
+
     if (this.props.diadocLinkIcon) {
       warning(false, `diadocLinkIcon has been deprecated`);
       return this.renderLinkButton(params);
@@ -360,7 +344,7 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
         [styles.label]: this.props.use !== 'link',
         [styles.labelWithLeftIcon]: !!this.props._icon,
         [styles.placeholder]: params.isPlaceholder,
-        [jsStyles.placeholder(this.theme)]: params.isPlaceholder,
+        [jsStyles.placeholder(theme)]: params.isPlaceholder,
         [styles.customUsePlaceholder]: params.isPlaceholder && this.props.use !== 'default',
       }),
       style: {
@@ -376,7 +360,7 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
           <span className={styles.labelText}>{params.label}</span>
         </span>
         <div className={styles.arrowWrap}>
-          <div className={cx(styles.arrow, jsStyles.arrow(this.theme), useIsCustom && styles.customUseArrow)} />
+          <div className={cx(styles.arrow, jsStyles.arrow(theme), useIsCustom && styles.customUseArrow)} />
         </div>
       </Button>
     );

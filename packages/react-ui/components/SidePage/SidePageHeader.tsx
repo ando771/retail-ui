@@ -4,8 +4,7 @@ import { Sticky } from '../Sticky';
 import { CrossIcon } from '../internal/icons/CrossIcon';
 import { isFunction } from '../../lib/utils';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
-import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../ThemeContext';
 
 import { jsStyles } from './SidePage.styles';
 import styles from './SidePage.module.less';
@@ -33,11 +32,13 @@ export interface SidePageHeaderState {
 export class SidePageHeader extends React.Component<SidePageHeaderProps, SidePageHeaderState> {
   public static __KONTUR_REACT_UI__ = 'SidePageHeader';
 
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
+
   public state = {
     isReadyToFix: false,
   };
 
-  private theme!: Theme;
   private wrapper: HTMLElement | null = null;
   private lastRegularHeight = 0;
 
@@ -65,17 +66,6 @@ export class SidePageHeader extends React.Component<SidePageHeaderProps, SidePag
   };
 
   public render(): JSX.Element {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
-  private renderMain() {
     const { isReadyToFix } = this.state;
     return (
       <div ref={this.wrapperRef}>
@@ -85,34 +75,38 @@ export class SidePageHeader extends React.Component<SidePageHeaderProps, SidePag
   }
 
   private renderHeader = (fixed = false) => {
+    const theme = this.context;
     return (
-      <div className={cx(styles.header, { [styles.fixed]: fixed, [jsStyles.fixed(this.theme)]: fixed })}>
+      <div className={cx(styles.header, { [styles.fixed]: fixed, [jsStyles.fixed(theme)]: fixed })}>
         {this.renderClose()}
-        <div className={cx(styles.title, { [styles.fixed]: fixed, [jsStyles.fixed(this.theme)]: fixed })}>
+        <div className={cx(styles.title, { [styles.fixed]: fixed, [jsStyles.fixed(theme)]: fixed })}>
           {isFunction(this.props.children) ? this.props.children(fixed) : this.props.children}
         </div>
       </div>
     );
   };
 
-  private renderCloseContent = (fixed: boolean) => (
-    <SidePageContext.Consumer>
-      {({ requestClose }) => (
-        <a
-          className={cx(styles.close, jsStyles.close(this.theme), {
-            [styles.fixed]: fixed,
-            [jsStyles.fixed(this.theme)]: fixed,
-          })}
-          onClick={requestClose}
-          data-tid="SidePage-Close"
-        >
+  private renderCloseContent = (fixed: boolean) => {
+    const theme = this.context;
+    return (
+      <SidePageContext.Consumer>
+        {({ requestClose }) => (
+          <a
+            className={cx(styles.close, jsStyles.close(theme), {
+              [styles.fixed]: fixed,
+              [jsStyles.fixed(theme)]: fixed,
+            })}
+            onClick={requestClose}
+            data-tid="SidePage-Close"
+          >
           <span className={styles.closeIcon}>
             <CrossIcon />
           </span>
-        </a>
-      )}
-    </SidePageContext.Consumer>
-  );
+          </a>
+        )}
+      </SidePageContext.Consumer>
+    );
+  };
 
   private renderClose = () => (
     <Sticky side="top" offset={CLOSE_ELEMENT_OFFSET}>

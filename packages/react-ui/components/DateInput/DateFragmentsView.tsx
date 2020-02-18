@@ -4,8 +4,7 @@ import { CHAR_MASK } from '../../lib/date/constants';
 import { InternalDateValidator } from '../../lib/date/InternalDateValidator';
 import { InternalDateComponentType, InternalDateFragment } from '../../lib/date/types';
 import { cx } from '../../lib/theming/Emotion';
-import { Theme } from '../../lib/theming/Theme';
-import { ThemeConsumer } from '../ThemeConsumer';
+import { ThemeContext } from '../ThemeContext';
 
 import { jsStyles } from './DateFragmentsView.styles';
 
@@ -17,34 +16,26 @@ interface DateFragmentViewProps {
 }
 
 export class DateFragmentsView extends React.Component<DateFragmentViewProps, {}> {
-  private theme!: Theme;
-  private rootNode: HTMLSpanElement | null = null;
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
+
+  private rootNodeEl = React.createRef<HTMLSpanElement>();
 
   public isFragment = (el: HTMLElement | EventTarget): boolean => {
-    if (this.rootNode) {
+    if (this.rootNodeEl.current) {
       // NOTE: NodeList doesn't support method 'forEach' in IE11
-      const fragments: HTMLSpanElement[] = Array.from(this.rootNode.querySelectorAll('[data-fragment]'));
+      const fragments: HTMLSpanElement[] = Array.from(this.rootNodeEl.current.querySelectorAll('[data-fragment]'));
       return fragments.some(fragment => fragment === el || fragment.contains(el as HTMLSpanElement));
     }
     return false;
   };
 
-  public getRootNode = () => this.rootNode;
+  public getRootNode = () => this.rootNodeEl.current;
 
   public render() {
+    const theme = this.context;
     return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
-  private renderMain() {
-    return (
-      <span ref={this.rootRef} className={jsStyles.root(this.theme)}>
+      <span ref={this.rootNodeEl} className={jsStyles.root(theme)}>
         {this.props.fragments.map((fragment, index) =>
           fragment.type === InternalDateComponentType.Separator
             ? this.renderSeparator(fragment, index)
@@ -55,8 +46,9 @@ export class DateFragmentsView extends React.Component<DateFragmentViewProps, {}
   }
 
   private renderSeparator(fragment: InternalDateFragment, index: number): JSX.Element {
-    const separatorClassName = cx(jsStyles.delimiter(this.theme), {
-      [jsStyles.delimiterFilled(this.theme)]: this.props.fragments[index + 1].value !== null,
+    const theme = this.context;
+    const separatorClassName = cx(jsStyles.delimiter(theme), {
+      [jsStyles.delimiterFilled(theme)]: this.props.fragments[index + 1].value !== null,
     });
 
     return (
@@ -68,6 +60,7 @@ export class DateFragmentsView extends React.Component<DateFragmentViewProps, {}
 
   private renderDateComponent(fragment: InternalDateFragment, index: number): JSX.Element {
     const { inputMode, onSelectDateComponent, selected } = this.props;
+    const theme = this.context;
     const { type, value, length, valueWithPad } = fragment;
 
     const valueMask = value === null || (selected === type && inputMode) ? value : valueWithPad || value;
@@ -84,12 +77,8 @@ export class DateFragmentsView extends React.Component<DateFragmentViewProps, {}
     return (
       <span key={index} data-fragment="" onMouseUp={handleMouseUp}>
         {valueMask}
-        <span className={jsStyles.mask(this.theme)}>{CHAR_MASK.repeat(lengthMask)}</span>
+        <span className={jsStyles.mask(theme)}>{CHAR_MASK.repeat(lengthMask)}</span>
       </span>
     );
   }
-
-  private rootRef = (el: HTMLSpanElement | null) => {
-    this.rootNode = el;
-  };
 }

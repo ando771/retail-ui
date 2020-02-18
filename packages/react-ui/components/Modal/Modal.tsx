@@ -10,8 +10,7 @@ import { HideBodyVerticalScroll } from '../HideBodyVerticalScroll';
 import { ModalStack, ModalStackSubscription } from '../ModalStack';
 import { ResizeDetector } from '../internal/ResizeDetector';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
-import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../ThemeContext';
 import { isIE11 } from '../../lib/utils';
 
 import { ModalContext, ModalContextProps } from './ModalContext';
@@ -95,12 +94,14 @@ export class Modal extends React.Component<ModalProps, ModalState> {
     },
   };
 
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
+
   public state: ModalState = {
     stackPosition: 0,
     horizontalScroll: false,
   };
 
-  private theme!: Theme;
   private stackSubscription: ModalStackSubscription | null = null;
   private containerNode: HTMLDivElement | null = null;
   private mouseDownTarget: EventTarget | null = null;
@@ -140,17 +141,6 @@ export class Modal extends React.Component<ModalProps, ModalState> {
   }
 
   public render(): JSX.Element {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
-  private renderMain() {
     let hasHeader = false;
     let hasFooter = false;
     let hasPanel = false;
@@ -186,6 +176,7 @@ export class Modal extends React.Component<ModalProps, ModalState> {
 
     const style: { width?: number | string } = {};
     const containerStyle: { width?: number | string } = {};
+    const theme = this.context;
 
     if (this.props.width) {
       style.width = this.props.width;
@@ -197,7 +188,7 @@ export class Modal extends React.Component<ModalProps, ModalState> {
       <RenderContainer>
         <ZIndex priority={'Modal'} className={styles.root}>
           <HideBodyVerticalScroll />
-          {this.state.stackPosition === 0 && <div className={cx(styles.bg, jsStyles.bg(this.theme))} />}
+          {this.state.stackPosition === 0 && <div className={cx(styles.bg, jsStyles.bg(theme))} />}
           <div
             ref={this.refContainer}
             className={styles.container}
@@ -207,12 +198,12 @@ export class Modal extends React.Component<ModalProps, ModalState> {
             data-tid="modal-container"
           >
             <div
-              className={cx(styles.centerContainer, jsStyles.centerContainer(this.theme), {
+              className={cx(styles.centerContainer, jsStyles.centerContainer(theme), {
                 [styles.alignTop]: !!this.props.alignTop,
               })}
               style={containerStyle}
             >
-              <div className={cx(styles.window, jsStyles.window(this.theme))} style={style}>
+              <div className={cx(styles.window, jsStyles.window(theme))} style={style}>
                 <ResizeDetector onResize={this.handleResize}>
                   <FocusLock disabled={isDisableFocusLock} autoFocus={false}>
                     {!hasHeader && !this.props.noClose ? (

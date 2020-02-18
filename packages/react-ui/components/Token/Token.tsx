@@ -4,8 +4,7 @@ import warningOutput from 'warning';
 import { CrossIcon } from '../internal/icons/CrossIcon';
 import { emptyHandler } from '../../lib/utils';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
-import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../ThemeContext';
 
 import { jsStyles, jsTokenColors } from './Token.styles';
 import styles from './Token.module.less';
@@ -50,20 +49,10 @@ export interface TokenProps {
 export class Token extends React.Component<TokenProps> {
   public static __KONTUR_REACT_UI__ = 'Token';
 
-  private theme!: Theme;
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
 
   public render() {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
-  private renderMain() {
     const {
       children,
       isActive,
@@ -92,7 +81,7 @@ export class Token extends React.Component<TokenProps> {
       }
     }
 
-    const theme = this.theme;
+    const theme = this.context;
 
     let tokenClassName = disabled ? jsTokenColors.defaultDisabled(theme) : jsTokenColors.defaultIdle(theme);
     let activeTokenClassName = disabled ? jsTokenColors.defaultDisabled(theme) : jsTokenColors.defaultActive(theme);

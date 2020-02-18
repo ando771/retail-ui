@@ -8,8 +8,7 @@ import { polyfillPlaceholder } from '../polyfillPlaceholder';
 import { Nullable, Override } from '../../typings/utility-types';
 import { MaskedInput } from '../internal/MaskedInput';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
-import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../ThemeContext';
 
 import classes from './Input.module.less';
 import { jsStyles } from './Input.styles';
@@ -112,6 +111,8 @@ export class Input extends React.Component<InputProps, InputState> {
   } = {
     size: 'small',
   };
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
 
   public state: InputState = {
     polyfillPlaceholder: false,
@@ -120,7 +121,6 @@ export class Input extends React.Component<InputProps, InputState> {
   };
 
   private selectAllId: number | null = null;
-  private theme!: Theme;
   private blinkTimeout = 0;
   private input: HTMLInputElement | null = null;
 
@@ -198,17 +198,6 @@ export class Input extends React.Component<InputProps, InputState> {
     return Boolean(mask && (focused || alwaysShowMask));
   }
 
-  public render(): JSX.Element {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
   /**
    * @public
    */
@@ -241,7 +230,8 @@ export class Input extends React.Component<InputProps, InputState> {
     }
   };
 
-  private renderMain() {
+  public render() {
+    const theme = this.context;
     const {
       onMouseEnter,
       onMouseLeave,
@@ -277,20 +267,20 @@ export class Input extends React.Component<InputProps, InputState> {
     const { blinking, focused } = this.state;
 
     const labelProps = {
-      className: cx(classes.root, jsStyles.root(this.theme), this.getSizeClassName(), {
+      className: cx(classes.root, jsStyles.root(theme), this.getSizeClassName(), {
         [classes.focus]: focused,
         [classes.disabled]: !!disabled,
         [classes.error]: !!error,
         [classes.warning]: !!warning,
         [classes.borderless]: !!borderless,
-        [jsStyles.focus(this.theme)]: focused,
-        [jsStyles.blink(this.theme)]: !!blinking,
-        [jsStyles.warning(this.theme)]: !!warning,
-        [jsStyles.error(this.theme)]: !!error,
-        [jsStyles.disabled(this.theme)]: !!disabled,
-        [jsStyles.focusFallback(this.theme)]: focused && (isIE11 || isEdge),
-        [jsStyles.warningFallback(this.theme)]: !!warning && (isIE11 || isEdge),
-        [jsStyles.errorFallback(this.theme)]: !!error && (isIE11 || isEdge),
+        [jsStyles.focus(theme)]: focused,
+        [jsStyles.blink(theme)]: !!blinking,
+        [jsStyles.warning(theme)]: !!warning,
+        [jsStyles.error(theme)]: !!error,
+        [jsStyles.disabled(theme)]: !!disabled,
+        [jsStyles.focusFallback(theme)]: focused && (isIE11 || isEdge),
+        [jsStyles.warningFallback(theme)]: !!warning && (isIE11 || isEdge),
+        [jsStyles.errorFallback(theme)]: !!error && (isIE11 || isEdge),
       }),
       style: { width },
       onMouseEnter,
@@ -300,7 +290,7 @@ export class Input extends React.Component<InputProps, InputState> {
 
     const inputProps = {
       ...rest,
-      className: cx(classes.input, jsStyles.input(this.theme)),
+      className: cx(classes.input, jsStyles.input(theme)),
       value,
       onChange: this.handleChange,
       onFocus: this.handleFocus,
@@ -377,16 +367,18 @@ export class Input extends React.Component<InputProps, InputState> {
       return <span className={className}>{icon()}</span>;
     }
 
-    return <span className={cx(className, classes.useDefaultColor, jsStyles.useDefaultColor(this.theme))}>{icon}</span>;
+    const theme = this.context;
+    return <span className={cx(className, classes.useDefaultColor, jsStyles.useDefaultColor(theme))}>{icon}</span>;
   }
 
   private renderPlaceholder() {
+    const theme = this.context;
     let placeholder = null;
 
     if (this.state.polyfillPlaceholder && this.props.placeholder && !this.isMaskVisible && !this.props.value) {
       placeholder = (
         <div
-          className={cx(classes.placeholder, jsStyles.placeholder(this.theme))}
+          className={cx(classes.placeholder, jsStyles.placeholder(theme))}
           style={{ textAlign: this.props.align || 'inherit' }}
         >
           {this.props.placeholder}
@@ -398,14 +390,15 @@ export class Input extends React.Component<InputProps, InputState> {
   }
 
   private getSizeClassName() {
+    const theme = this.context;
     switch (this.props.size) {
       case 'large':
-        return { [jsStyles.sizeLarge(this.theme)]: true, [jsStyles.sizeLargeFallback(this.theme)]: isIE11 || isEdge };
+        return { [jsStyles.sizeLarge(theme)]: true, [jsStyles.sizeLargeFallback(theme)]: isIE11 || isEdge };
       case 'medium':
-        return { [jsStyles.sizeMedium(this.theme)]: true, [jsStyles.sizeMediumFallback(this.theme)]: isIE11 || isEdge };
+        return { [jsStyles.sizeMedium(theme)]: true, [jsStyles.sizeMediumFallback(theme)]: isIE11 || isEdge };
       case 'small':
       default:
-        return { [jsStyles.sizeSmall(this.theme)]: true, [jsStyles.sizeSmallFallback(this.theme)]: isIE11 || isEdge };
+        return { [jsStyles.sizeSmall(theme)]: true, [jsStyles.sizeSmallFallback(theme)]: isIE11 || isEdge };
     }
   }
 
@@ -444,15 +437,11 @@ export class Input extends React.Component<InputProps, InputState> {
       this.input ? this.selectAll() : this.delaySelectAll();
     }
 
-    if (this.props.onFocus) {
-      this.props.onFocus(event);
-    }
+    this.props.onFocus?.(event);
   };
 
   private handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (this.props.onKeyDown) {
-      this.props.onKeyDown(e);
-    }
+    this.props.onKeyDown?.(e);
 
     const isDeleteKey = someKeys(isKeyBackspace, isKeyDelete)(e);
 
@@ -462,9 +451,7 @@ export class Input extends React.Component<InputProps, InputState> {
   };
 
   private handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (this.props.onKeyPress) {
-      this.props.onKeyPress(event);
-    }
+    this.props.onKeyPress?.(event);
 
     if (this.props.maxLength === event.currentTarget.value.length) {
       this.handleUnexpectedInput(event.currentTarget.value);
@@ -472,9 +459,7 @@ export class Input extends React.Component<InputProps, InputState> {
   };
 
   private handleMaskedValueChange = (value: string) => {
-    if (this.props.onValueChange) {
-      this.props.onValueChange(value);
-    }
+    this.props.onValueChange?.(value);
   };
 
   private handleUnexpectedInput = (value: string = this.props.value || '') => {
@@ -487,10 +472,7 @@ export class Input extends React.Component<InputProps, InputState> {
 
   private handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     this.setState({ focused: false });
-
-    if (this.props.onBlur) {
-      this.props.onBlur(event);
-    }
+    this.props.onBlur?.(event);
   };
 
   private renderPrefix = () => {
@@ -500,7 +482,8 @@ export class Input extends React.Component<InputProps, InputState> {
       return null;
     }
 
-    return <span className={jsStyles.prefix(this.theme)}>{prefix}</span>;
+    const theme = this.context;
+    return <span className={jsStyles.prefix(theme)}>{prefix}</span>;
   };
 
   private renderSuffix = () => {
@@ -510,6 +493,7 @@ export class Input extends React.Component<InputProps, InputState> {
       return null;
     }
 
-    return <span className={jsStyles.suffix(this.theme)}>{suffix}</span>;
+    const theme = this.context;
+    return <span className={jsStyles.suffix(theme)}>{suffix}</span>;
   };
 }

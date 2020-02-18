@@ -6,7 +6,7 @@ import { Override } from '../../typings/utility-types';
 import { tabListener } from '../../lib/events/tabListener';
 import { cx } from '../../lib/theming/Emotion';
 import { Theme } from '../../lib/theming/Theme';
-import { ThemeConsumer } from '../ThemeConsumer';
+import { ThemeContext } from '../ThemeContext';
 
 import { jsStyles } from './Link.styles';
 import styles from './Link.module.less';
@@ -73,26 +73,17 @@ export class Link extends React.Component<LinkProps, LinkState> {
     href: '',
     use: 'default',
   };
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
 
   public state = {
     focusedByTab: false,
   };
 
-  private theme!: Theme;
   private getProps = createPropsGetter(Link.defaultProps);
 
   public render(): JSX.Element {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
-  private renderMain() {
+    const theme = this.context;
     const { disabled, href, icon, use, _button, _buttonOpened, className, style, ...rest } = this.getProps<
       LinkProps,
       Link
@@ -111,11 +102,11 @@ export class Link extends React.Component<LinkProps, LinkState> {
     const props = {
       className: cx({
         [styles.disabled]: !!disabled,
-        [jsStyles.disabled(this.theme)]: !!disabled,
+        [jsStyles.disabled(theme)]: !!disabled,
         [styles.button]: !!_button,
         [styles.buttonOpened]: !!_buttonOpened,
-        [jsStyles.focus(this.theme)]: !disabled && this.state.focusedByTab,
-        [getUseClasses(this.theme)[use as keyof UseClasses]]: !!use,
+        [jsStyles.focus(theme)]: !disabled && this.state.focusedByTab,
+        [getUseClasses(theme)[use as keyof UseClasses]]: !!use,
       }),
       href,
       onClick: this._handleClick,

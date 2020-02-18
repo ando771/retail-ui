@@ -10,8 +10,7 @@ import { Nullable } from '../../typings/utility-types';
 import { PopupMenuCaptionProps } from '../internal/PopupMenu/PopupMenu';
 import { PopupPosition } from '../Popup';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
-import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../ThemeContext';
 import { MenuKebabIcon } from '../internal/icons/16px';
 
 import { jsStyles } from './Kebab.styles';
@@ -61,14 +60,14 @@ export class Kebab extends React.Component<KebabProps, KebabState> {
     size: 'small',
     disableAnimations: Boolean(process.env.enableReactTesting),
   };
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
 
   public state = {
     opened: false,
     focusedByTab: false,
     anchor: null,
   };
-
-  private theme!: Theme;
 
   private listener: {
     remove: () => void;
@@ -86,17 +85,6 @@ export class Kebab extends React.Component<KebabProps, KebabState> {
   }
 
   public render(): JSX.Element {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
-  private renderMain() {
     const { disabled, positions } = this.props;
 
     return (
@@ -115,6 +103,7 @@ export class Kebab extends React.Component<KebabProps, KebabState> {
   }
 
   private renderCaption = (captionProps: PopupMenuCaptionProps) => {
+    const theme = this.context;
     const { disabled } = this.props;
     const handleCaptionKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (!disabled) {
@@ -140,7 +129,7 @@ export class Kebab extends React.Component<KebabProps, KebabState> {
           captionProps.opened && styles.opened,
           disabled && styles.disabled,
           this.state.focusedByTab && styles.focused,
-          this.state.focusedByTab && jsStyles.focused(this.theme),
+          this.state.focusedByTab && jsStyles.focused(theme),
         )}
       >
         {this.renderIcon()}

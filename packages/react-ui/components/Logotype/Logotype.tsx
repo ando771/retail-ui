@@ -6,8 +6,7 @@ import { stopPropagation } from '../../lib/events/stopPropagation';
 import { locale } from '../Locale/decorators';
 import { Nullable } from '../../typings/utility-types';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeConsumer } from '../ThemeConsumer';
-import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../ThemeContext';
 import { CloudIcon } from '../internal/icons/CloudIcon';
 import { ArrowChevronDownIcon } from '../internal/icons/16px';
 
@@ -92,8 +91,9 @@ export class Logotype extends React.Component<LogotypeProps> {
     component: 'a',
     href: '/',
   };
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
 
-  private theme!: Theme;
   private readonly locale!: LogotypeLocale;
   private logoWrapper: Nullable<HTMLElement> = null;
   private isWidgetInited = false;
@@ -121,17 +121,7 @@ export class Logotype extends React.Component<LogotypeProps> {
   }
 
   public render(): JSX.Element {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
-  private renderMain() {
+    const theme = this.context;
     const {
       color,
       textColor,
@@ -160,7 +150,7 @@ export class Logotype extends React.Component<LogotypeProps> {
           <Component
             href={href}
             tabIndex="-1"
-            className={cx(styles.root, jsStyles.root(this.theme))}
+            className={cx(styles.root, jsStyles.root(theme))}
             style={{ fontSize: `${size}px` }}
           >
             <span style={{ color: textColor }}>{propLocale.prefix}</span>
@@ -173,7 +163,7 @@ export class Logotype extends React.Component<LogotypeProps> {
             </span>
             {suffix && <span style={{ color }}>{suffix}</span>}
           </Component>
-          {withWidget && <span className={cx(styles.divider, jsStyles.divider(this.theme))} />}
+          {withWidget && <span className={cx(styles.divider, jsStyles.divider(theme))} />}
         </span>
         {withWidget && (
           <button className={styles.button} onClick={onArrowClick}>

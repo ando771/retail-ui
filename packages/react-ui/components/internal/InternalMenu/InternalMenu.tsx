@@ -8,8 +8,7 @@ import { isMenuHeader } from '../../MenuHeader';
 import { createPropsGetter } from '../createPropsGetter';
 import { Nullable } from '../../../typings/utility-types';
 import { cx } from '../../../lib/theming/Emotion';
-import { ThemeConsumer } from '../../ThemeConsumer';
-import { Theme } from '../../../lib/theming/Theme';
+import { ThemeContext } from '../../ThemeContext';
 
 import { jsStyles } from './InternalMenu.styles';
 import styles from './InternalMenu.module.less';
@@ -50,13 +49,14 @@ export class InternalMenu extends React.Component<MenuProps, MenuState> {
     initialSelectedItemIndex: -1,
   };
 
+  public static contextType = ThemeContext;
+
   public state: MenuState = {
     highlightedIndex: -1,
     maxHeight: this.props.maxHeight || 'none',
     scrollState: 'top',
   };
 
-  private theme!: Theme;
   private scrollContainer: Nullable<ScrollContainer>;
   private highlighted: Nullable<MenuItem>;
   private rootElement: Nullable<HTMLDivElement>;
@@ -88,17 +88,7 @@ export class InternalMenu extends React.Component<MenuProps, MenuState> {
   }
 
   public render() {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
-  private renderMain() {
+    const theme = this.context;
     const enableIconPadding = React.Children.toArray(this.props.children).some(
       x => React.isValidElement(x) && x.props.icon,
     );
@@ -109,7 +99,7 @@ export class InternalMenu extends React.Component<MenuProps, MenuState> {
 
     return (
       <div
-        className={cx(styles.root, jsStyles.root(this.theme), this.props.hasShadow && styles.shadow)}
+        className={cx(styles.root, jsStyles.root(theme), this.props.hasShadow && styles.shadow)}
         style={{
           width: this.props.width,
           maxHeight: this.state.maxHeight,

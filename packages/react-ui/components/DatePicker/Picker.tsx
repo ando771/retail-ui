@@ -8,8 +8,7 @@ import { locale } from '../Locale/decorators';
 import { Nullable } from '../../typings/utility-types';
 import { isGreater, isLess } from '../Calendar/CalendarDateShape';
 import { cx } from '../../lib/theming/Emotion';
-import { Theme } from '../../lib/theming/Theme';
-import { ThemeConsumer } from '../ThemeConsumer';
+import { ThemeContext } from '../ThemeContext';
 
 import { jsStyles } from './Picker.styles';
 import { DatePickerLocale, DatePickerLocaleHelper } from './locale';
@@ -43,7 +42,9 @@ const getTodayCalendarDate = () => {
 export class Picker extends React.Component<Props, State> {
   public static __KONTUR_REACT_UI__ = 'Picker';
 
-  private theme!: Theme;
+  public static contextType = ThemeContext;
+  public context!: React.ContextType<typeof ThemeContext>;
+
   private calendar: Calendar | null = null;
   private readonly locale!: DatePickerLocale;
 
@@ -64,20 +65,11 @@ export class Picker extends React.Component<Props, State> {
   }
 
   public render() {
-    return (
-      <ThemeConsumer>
-        {theme => {
-          this.theme = theme;
-          return this.renderMain();
-        }}
-      </ThemeConsumer>
-    );
-  }
-
-  private renderMain() {
+    const theme = this.context;
     const { date } = this.state;
+
     return (
-      <div className={cx(styles.root, jsStyles.root(this.theme))} onMouseDown={e => e.preventDefault()}>
+      <div className={cx(styles.root, jsStyles.root(theme))} onMouseDown={e => e.preventDefault()}>
         <Calendar
           ref={c => (this.calendar = c)}
           value={this.props.value}
@@ -94,17 +86,16 @@ export class Picker extends React.Component<Props, State> {
   }
 
   private scrollToMonth = (month: number, year: number) => {
-    if (this.calendar) {
-      this.calendar.scrollToMonth(month, year);
-    }
+    this.calendar?.scrollToMonth(month, year);
   };
 
   private renderTodayLink() {
+    const theme = this.context;
     const { order, separator } = this.locale;
     const today = new InternalDate({ order, separator }).setComponents(InternalDateGetter.getTodayComponents());
     return (
       <button
-        className={cx(styles.todayWrapper, jsStyles.todayWrapper(this.theme))}
+        className={cx(styles.todayWrapper, jsStyles.todayWrapper(theme))}
         onClick={this.handleSelectToday(today)}
         tabIndex={-1}
       >
@@ -114,9 +105,7 @@ export class Picker extends React.Component<Props, State> {
   }
 
   private handleSelectToday = (today: InternalDate) => () => {
-    if (this.props.onSelect) {
-      this.props.onSelect(today.toNativeFormat()!);
-    }
+    this.props.onSelect?.(today.toNativeFormat()!);
     if (this.calendar) {
       const { month, year } = this.state.today;
       this.calendar.scrollToMonth(month, year);
