@@ -5,7 +5,7 @@ import { InternalDateTransformer } from '../../../lib/date/InternalDateTransform
 import { Nullable } from '../../../typings/utility-types';
 import { Button } from '../../Button';
 import { Gapped } from '../../Gapped';
-import { LangCodes, LocaleContext } from '../../Locale';
+import { LangCodes, LocaleContext } from '../../../lib/locale';
 import { Calendar } from '../Calendar';
 
 storiesOf('Calendar', module)

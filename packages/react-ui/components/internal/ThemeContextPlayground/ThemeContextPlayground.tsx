@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 
+import { ThemeContext } from '../../../lib/theming/ThemeContext';
 import { Theme, ThemeIn } from '../../../lib/theming/Theme';
 import { ThemeFactory } from '../../../lib/theming/ThemeFactory';
 import { FLAT_THEME as flatThemeVariables } from '../../../lib/theming/themes/FlatTheme';
-import { ThemeProvider } from '../ThemeProvider';
 import { SidePage } from '../../SidePage';
 import { Gapped } from '../../Gapped';
 import { ComboBox } from '../../ComboBox';
@@ -50,7 +50,7 @@ interface ThemeExtension {
 export type PlaygroundTheme = Theme & ThemeExtension;
 export type ThemeErrorsType = { [key in keyof PlaygroundTheme]?: boolean };
 
-export class ThemeProviderPlayground extends React.Component<PlaygroundProps, PlaygroundState> {
+export class ThemeContextPlayground extends React.Component<PlaygroundProps, PlaygroundState> {
   private readonly editableThemesItems = [
     { value: ThemeType.Default, label: 'Дефолтная' },
     { value: ThemeType.Flat, label: 'Плоская' },
@@ -79,7 +79,7 @@ export class ThemeProviderPlayground extends React.Component<PlaygroundProps, Pl
   public render() {
     const { currentTheme, editorOpened, currentThemeType } = this.state;
     return (
-      <ThemeProvider value={currentTheme}>
+      <ThemeContext.Provider value={currentTheme}>
         {editorOpened && this.renderSidePage()}
         {
           <Playground
@@ -88,7 +88,7 @@ export class ThemeProviderPlayground extends React.Component<PlaygroundProps, Pl
             onEditLinkClick={this.handleOpen}
           />
         }
-      </ThemeProvider>
+      </ThemeContext.Provider>
     );
   }
 

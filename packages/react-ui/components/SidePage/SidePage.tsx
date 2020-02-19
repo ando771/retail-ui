@@ -10,7 +10,8 @@ import { RenderContainer } from '../RenderContainer';
 import { RenderLayer } from '../RenderLayer';
 import { ZIndex } from '../ZIndex';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 
 import { SidePageBody } from './SidePageBody';
 import { SidePageContainer } from './SidePageContainer';
@@ -90,11 +91,8 @@ export class SidePage extends React.Component<SidePageProps, SidePageState> {
   public static Body = SidePageBody;
   public static Footer = SidePageFooter;
   public static Container = SidePageContainer;
-
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
-
   public state: SidePageState = {};
+  private theme!: Theme;
   private stackSubscription: ModalStackSubscription | null = null;
   private layoutRef: HTMLElement | null = null;
   private footer: SidePageFooter | null = null;
@@ -123,6 +121,17 @@ export class SidePage extends React.Component<SidePageProps, SidePageState> {
   };
 
   public render(): JSX.Element {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const { disableAnimations } = this.props;
 
     return (
@@ -158,7 +167,6 @@ export class SidePage extends React.Component<SidePageProps, SidePageState> {
   }
 
   private renderContainer(): JSX.Element {
-    const theme = this.context;
     const { classes, style } = this.getZIndexProps();
 
     return (
@@ -173,8 +181,8 @@ export class SidePage extends React.Component<SidePageProps, SidePageState> {
           <div
             className={cx(
               styles.container,
-              jsStyles.container(theme),
-              this.state.hasShadow && jsStyles.shadow(theme),
+              jsStyles.container(this.theme),
+              this.state.hasShadow && jsStyles.shadow(this.theme),
             )}
             style={this.getSidebarStyle()}
           >

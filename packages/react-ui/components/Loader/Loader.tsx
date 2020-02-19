@@ -6,7 +6,8 @@ import * as LayoutEvents from '../../lib/LayoutEvents';
 import { Spinner, SpinnerProps } from '../Spinner';
 import { Nullable } from '../../typings/utility-types';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 import { ZIndex } from '../ZIndex';
 
 import { jsStyles } from './Loader.styles';
@@ -87,9 +88,7 @@ export class Loader extends React.Component<LoaderProps, LoaderState> {
     cloud: PropTypes.bool,
   };
 
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
-
+  private theme!: Theme;
   private containerNode: Nullable<HTMLDivElement>;
   private spinnerNode: Nullable<HTMLSpanElement>;
   private spinnerHeight?: number;
@@ -127,8 +126,18 @@ export class Loader extends React.Component<LoaderProps, LoaderState> {
   }
 
   public render() {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const { active, type, caption, className } = this.props;
-    const theme = this.context;
 
     return (
       <div style={{ position: 'relative' }} className={cx(styles.loader, className)}>
@@ -146,7 +155,7 @@ export class Loader extends React.Component<LoaderProps, LoaderState> {
             priority={'Loader'}
             className={cx({
               [styles.active]: active,
-              [jsStyles.active(theme)]: active,
+              [jsStyles.active(this.theme)]: active,
             })}
           >
             {this.renderSpinner(type, caption)}

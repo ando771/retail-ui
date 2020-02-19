@@ -3,12 +3,13 @@ import isEqual from 'lodash.isequal';
 import warning from 'warning';
 
 import { Link } from '../Link';
-import { locale } from '../Locale/decorators';
+import { locale } from '../../lib/locale/decorators';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 import { EditIcon } from '../internal/icons/16px';
-import { defaultLangCode } from '../Locale/constants';
-import { LocaleContext } from '../Locale';
+import { LocaleContext } from '../../lib/locale';
+import { defaultLangCode } from '../../lib/locale/constants';
 
 import { FiasLocale, FiasLocaleHelper } from './locale';
 import { APIProvider, ExtraFields, FiasValue, Fields, FieldsSettings, FormValidation } from './types';
@@ -141,8 +142,6 @@ export class Fias extends React.Component<FiasProps, FiasState> {
     fieldsSettings: {},
     countrySelector: false,
   };
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
 
   public state: FiasState = {
     opened: false,
@@ -151,6 +150,7 @@ export class Fias extends React.Component<FiasProps, FiasState> {
     fieldsSettings: this.fieldsSettings,
   };
 
+  private theme!: Theme;
   private api: APIProvider = this.props.api || new FiasAPI(this.props.baseUrl, this.props.version);
   private form: FiasForm | null = null;
 
@@ -211,7 +211,17 @@ export class Fias extends React.Component<FiasProps, FiasState> {
   }
 
   public render() {
-    const theme = this.context;
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const { showAddressText, label, icon, error, warning, feedback } = this.props;
     const { opened, address } = this.state;
 
@@ -219,7 +229,7 @@ export class Fias extends React.Component<FiasProps, FiasState> {
 
     const validation =
       (error || warning) && feedback ? (
-        <span className={cx({ [jsStyles.error(theme)]: !!error, [jsStyles.warning(theme)]: !!warning })}>
+        <span className={cx({ [jsStyles.error(this.theme)]: !!error, [jsStyles.warning(this.theme)]: !!warning })}>
           {feedback}
         </span>
       ) : null;
@@ -292,7 +302,10 @@ export class Fias extends React.Component<FiasProps, FiasState> {
 
   private handleClose = () => {
     this.setState({ opened: false });
-    this.props.onClose?.();
+    const onClose = this.props.onClose;
+    if (onClose) {
+      onClose();
+    }
   };
 
   private handleSave = async () => {

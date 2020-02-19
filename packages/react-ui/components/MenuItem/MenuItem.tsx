@@ -4,7 +4,8 @@ import warning from 'warning';
 
 import { isFunction } from '../../lib/utils';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 
 import { jsStyles } from './MenuItem.styles';
 import styles from './MenuItem.module.less';
@@ -65,13 +66,21 @@ export class MenuItem extends React.Component<MenuItemProps> {
     onClick: PropTypes.func,
   };
 
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
-
+  private theme!: Theme;
   private mouseEntered = false;
 
   public render() {
-    const theme = this.context;
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const {
       alkoLink,
       link,
@@ -98,14 +107,14 @@ export class MenuItem extends React.Component<MenuItemProps> {
 
     const className = cx({
       [styles.root]: true,
-      [jsStyles.root(theme)]: true,
+      [jsStyles.root(this.theme)]: true,
       [styles.disabled]: !!this.props.disabled,
       [styles.loose]: !!loose,
-      [jsStyles.hover(theme)]: hover,
-      [jsStyles.selected(theme)]: state === 'selected',
-      [jsStyles.link(theme)]: !!link || !!alkoLink,
-      [jsStyles.withIcon(theme)]: Boolean(iconElement) || !!_enableIconPadding,
-      [jsStyles.disabled(theme)]: !!this.props.disabled,
+      [jsStyles.hover(this.theme)]: hover,
+      [jsStyles.selected(this.theme)]: state === 'selected',
+      [jsStyles.link(this.theme)]: !!link || !!alkoLink,
+      [jsStyles.withIcon(this.theme)]: Boolean(iconElement) || !!_enableIconPadding,
+      [jsStyles.disabled(this.theme)]: !!this.props.disabled,
     });
 
     let content = children;

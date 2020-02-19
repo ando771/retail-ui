@@ -3,7 +3,8 @@ import React from 'react';
 import { isIE11, isEdge } from '../../lib/utils';
 import { cx } from '../../lib/theming/Emotion';
 import { tabListener } from '../../lib/events/tabListener';
-import { ThemeContext } from '../ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
 
 import { jsStyles } from './Button.styles';
 import classes from './Button.module.less';
@@ -116,13 +117,12 @@ export class Button extends React.Component<ButtonProps, ButtonState> {
     size: 'small',
     type: 'button',
   };
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
 
   public state = {
     focusedByTab: false,
   };
 
+  private theme!: Theme;
   private node: HTMLButtonElement | null = null;
 
   public componentDidMount() {
@@ -147,7 +147,17 @@ export class Button extends React.Component<ButtonProps, ButtonState> {
   }
 
   public render(): JSX.Element {
-    const theme = this.context;
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const { corners = 0 } = this.props;
     const sizeClass = this.getSizeClassName();
 
@@ -160,13 +170,13 @@ export class Button extends React.Component<ButtonProps, ButtonState> {
       type: this.props.type,
       className: cx({
         [classes.root]: true,
-        [jsStyles.root(theme)]: true,
-        [cx(jsStyles[this.props.use!] && jsStyles[this.props.use!](theme)) || jsStyles.default(theme)]: true,
+        [jsStyles.root(this.theme)]: true,
+        [cx(jsStyles[this.props.use!] && jsStyles[this.props.use!](this.theme)) || jsStyles.default(this.theme)]: true,
         [classes.active]: !!this.props.active,
         [classes.checked]: !!this.props.checked,
-        [jsStyles.checked(theme)]: !!this.props.checked,
+        [jsStyles.checked(this.theme)]: !!this.props.checked,
         [classes.disabled]: !!this.props.disabled || !!this.props.loading,
-        [jsStyles.disabled(theme)]: !!this.props.disabled || !!this.props.loading,
+        [jsStyles.disabled(this.theme)]: !!this.props.disabled || !!this.props.loading,
         [classes.errorRoot]: isError,
         [classes.warningRoot]: isWarning,
         [classes.error]: isError,
@@ -177,7 +187,7 @@ export class Button extends React.Component<ButtonProps, ButtonState> {
         [classes.buttonWithIcon]: !!this.props.icon,
         [sizeClass]: true,
         [classes.focus]: this.state.focusedByTab || !!this.props.visuallyFocused,
-        [jsStyles.focus(theme)]: this.state.focusedByTab || !!this.props.visuallyFocused,
+        [jsStyles.focus(this.theme)]: this.state.focusedByTab || !!this.props.visuallyFocused,
         [classes.borderless]: !!this.props.borderless,
         [classes.fallback]: isIE11 || isEdge,
       }),
@@ -202,7 +212,7 @@ export class Button extends React.Component<ButtonProps, ButtonState> {
     const wrapProps = {
       className: cx({
         [classes.wrap]: true,
-        [jsStyles.wrap(theme)]: true,
+        [jsStyles.wrap(this.theme)]: true,
         [classes.wrap_arrow]: !!this.props.arrow,
         [classes.wrap_arrow_left]: this.props.arrow === 'left',
       }),
@@ -213,9 +223,9 @@ export class Button extends React.Component<ButtonProps, ButtonState> {
 
     let error = null;
     if (this.props.error) {
-      error = <div className={cx(classes.error, jsStyles.error(theme))} />;
+      error = <div className={cx(classes.error, jsStyles.error(this.theme))} />;
     } else if (this.props.warning) {
-      error = <div className={cx(classes.warning, jsStyles.warning(theme))} />;
+      error = <div className={cx(classes.warning, jsStyles.warning(this.theme))} />;
     }
 
     let loading = null;
@@ -238,8 +248,8 @@ export class Button extends React.Component<ButtonProps, ButtonState> {
             [classes.arrow_loading || '']: !!this.props.loading,
             [classes.arrow_warning || '']: isWarning,
             [classes.arrow_error || '']: isError,
-            [jsStyles.arrow_warning(theme)]: isWarning,
-            [jsStyles.arrow_error(theme)]: isError,
+            [jsStyles.arrow_warning(this.theme)]: isWarning,
+            [jsStyles.arrow_error(this.theme)]: isError,
           })}
         />
       );
@@ -249,15 +259,15 @@ export class Button extends React.Component<ButtonProps, ButtonState> {
     if (this.props.use === 'link') {
       rootProps.className = cx({
         [classes.root]: true,
-        [jsStyles.root(theme)]: true,
+        [jsStyles.root(this.theme)]: true,
         [classes.link]: true,
-        [jsStyles.link(theme)]: true,
+        [jsStyles.link(this.theme)]: true,
         [classes.disabled]: !!this.props.disabled,
-        [jsStyles.disabled(theme)]: !!this.props.disabled,
+        [jsStyles.disabled(this.theme)]: !!this.props.disabled,
         [classes.buttonWithIcon]: !!this.props.icon,
         [sizeClass]: true,
         [classes.focus]: this.state.focusedByTab || !!this.props.visuallyFocused,
-        [jsStyles.focus(theme)]: this.state.focusedByTab || !!this.props.visuallyFocused,
+        [jsStyles.focus(this.theme)]: this.state.focusedByTab || !!this.props.visuallyFocused,
       });
       Object.assign(wrapProps, {
         className: cx(classes.wrap, {
@@ -286,15 +296,14 @@ export class Button extends React.Component<ButtonProps, ButtonState> {
   }
 
   private getSizeClassName() {
-    const theme = this.context;
     switch (this.props.size) {
       case 'large':
-        return cx(jsStyles.sizeLarge(theme));
+        return cx(jsStyles.sizeLarge(this.theme));
       case 'medium':
-        return cx(jsStyles.sizeMedium(theme));
+        return cx(jsStyles.sizeMedium(this.theme));
       case 'small':
       default:
-        return cx(jsStyles.sizeSmall(theme));
+        return cx(jsStyles.sizeSmall(this.theme));
     }
   }
 

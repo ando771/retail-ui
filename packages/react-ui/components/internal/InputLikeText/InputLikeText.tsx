@@ -9,7 +9,8 @@ import { InputProps, InputIconType, InputState } from '../../Input';
 import { cx } from '../../../lib/theming/Emotion';
 import inputStyles from '../../Input/Input.module.less';
 import { jsStyles as jsInputStyles } from '../../Input/Input.styles';
-import { ThemeContext } from '../../ThemeContext';
+import { ThemeContext } from '../../../lib/theming/ThemeContext';
+import { Theme } from '../../../lib/theming/Theme';
 
 import { jsStyles } from './InputLikeText.styles';
 import { HiddenInput } from './HiddenInput';
@@ -29,11 +30,10 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
   public static __KONTUR_REACT_UI__ = 'InputLikeText';
 
   public static defaultProps = { size: 'small' };
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
 
   public state = { blinking: false, focused: false };
 
+  private theme!: Theme;
   private node: HTMLElement | null = null;
   private hiddenInput: HTMLInputElement | null = null;
   private lastSelectedInnerNode: [HTMLElement, number, number] | null = null;
@@ -47,14 +47,18 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
    * @public
    */
   public focus() {
-    this.node?.focus();
+    if (this.node) {
+      this.node.focus();
+    }
   }
 
   /**
    * @public
    */
   public blur() {
-    this.node?.blur();
+    if (this.node) {
+      this.node.blur();
+    }
   }
 
   /**
@@ -85,7 +89,7 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
     if (this.focusTimeout) {
       clearInterval(this.focusTimeout);
     }
-    this.focusTimeout = window.setTimeout(() => (isIE11 || isEdge) && this.node?.focus(), 0);
+    this.focusTimeout = window.setTimeout(() => (isIE11 || isEdge) && this.node && this.node.focus(), 0);
   };
 
   public componentDidMount() {
@@ -108,6 +112,17 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
   }
 
   public render() {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const {
       innerRef,
       tabIndex,
@@ -131,15 +146,14 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
     } = this.props;
 
     const { focused, blinking } = this.state;
-    const theme = this.context;
 
     const leftSide = this.renderLeftSide();
     const rightSide = this.renderRightSide();
 
     const className = cx(
       inputStyles.root,
-      jsStyles.root(theme),
-      jsInputStyles.root(theme),
+      jsStyles.root(this.theme),
+      jsInputStyles.root(this.theme),
       this.getSizeClassName(),
       {
         [inputStyles.focus]: focused,
@@ -147,20 +161,20 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
         [inputStyles.error]: !!error,
         [inputStyles.borderless]: !!borderless,
         [inputStyles.disabled]: !!disabled,
-        [jsStyles.withoutLeftSide(theme)]: !leftSide,
-        [jsInputStyles.focus(theme)]: focused,
-        [jsInputStyles.blink(theme)]: blinking,
-        [jsInputStyles.warning(theme)]: !!warning,
-        [jsInputStyles.error(theme)]: !!error,
-        [jsInputStyles.disabled(theme)]: !!disabled,
-        [jsInputStyles.focusFallback(theme)]: focused && (isIE11 || isEdge),
-        [jsInputStyles.warningFallback(theme)]: !!warning && (isIE11 || isEdge),
-        [jsInputStyles.errorFallback(theme)]: !!error && (isIE11 || isEdge),
+        [jsStyles.withoutLeftSide(this.theme)]: !leftSide,
+        [jsInputStyles.focus(this.theme)]: focused,
+        [jsInputStyles.blink(this.theme)]: blinking,
+        [jsInputStyles.warning(this.theme)]: !!warning,
+        [jsInputStyles.error(this.theme)]: !!error,
+        [jsInputStyles.disabled(this.theme)]: !!disabled,
+        [jsInputStyles.focusFallback(this.theme)]: focused && (isIE11 || isEdge),
+        [jsInputStyles.warningFallback(this.theme)]: !!warning && (isIE11 || isEdge),
+        [jsInputStyles.errorFallback(this.theme)]: !!error && (isIE11 || isEdge),
       },
     );
 
     const wrapperClass = cx(inputStyles.wrapper, {
-      [jsStyles.userSelectContain(theme)]: focused,
+      [jsStyles.userSelectContain(this.theme)]: focused,
     });
 
     return (
@@ -178,7 +192,7 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
         <input type="hidden" value={value} />
         {leftSide}
         <span className={wrapperClass}>
-          <span className={cx(inputStyles.input, jsStyles.input(theme), jsInputStyles.input(theme))}>
+          <span className={cx(inputStyles.input, jsStyles.input(this.theme), jsInputStyles.input(this.theme))}>
             {children}
           </span>
           {this.renderPlaceholder()}
@@ -206,9 +220,8 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
       return <span className={className}>{icon()}</span>;
     }
 
-    const theme = this.context;
     return (
-      <span className={cx(className, inputStyles.useDefaultColor, jsInputStyles.useDefaultColor(theme))}>
+      <span className={cx(className, inputStyles.useDefaultColor, jsInputStyles.useDefaultColor(this.theme))}>
         {icon}
       </span>
     );
@@ -221,8 +234,7 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
       return null;
     }
 
-    const theme = this.context;
-    return <span className={jsInputStyles.prefix(theme)}>{prefix}</span>;
+    return <span className={jsInputStyles.prefix(this.theme)}>{prefix}</span>;
   };
 
   private renderSuffix = (): JSX.Element | null => {
@@ -232,8 +244,7 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
       return null;
     }
 
-    const theme = this.context;
-    return <span className={jsInputStyles.suffix(theme)}>{suffix}</span>;
+    return <span className={jsInputStyles.suffix(this.theme)}>{suffix}</span>;
   };
 
   private renderLeftSide = (): JSX.Element | null => {
@@ -270,10 +281,9 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
 
   private renderPlaceholder = (): JSX.Element | null => {
     const { children, placeholder } = this.props;
-    const theme = this.context;
 
     if (!children && placeholder) {
-      return <span className={cx(inputStyles.placeholder, jsInputStyles.placeholder(theme))}>{placeholder}</span>;
+      return <span className={cx(inputStyles.placeholder, jsInputStyles.placeholder(this.theme))}>{placeholder}</span>;
     }
     return null;
   };
@@ -305,32 +315,39 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
         if (this.lastSelectedInnerNode) {
           this.selectInnerNode(...this.lastSelectedInnerNode);
         }
-        this.node?.focus();
+        if (this.node) {
+          this.node.focus();
+        }
       }, 0);
 
       this.hiddenInput.focus();
     }
 
-    this.props.onKeyDown?.(e as React.KeyboardEvent<HTMLInputElement>);
+    if (this.props.onKeyDown) {
+      this.props.onKeyDown(e as React.KeyboardEvent<HTMLInputElement>);
+    }
   };
 
   private handleMouseDragStart: MouseDragEventHandler = e => {
-    const theme = this.context;
     this.dragging = true;
-    document.documentElement.classList.add(jsStyles.userSelectNone(theme));
+    document.documentElement.classList.add(jsStyles.userSelectNone(this.theme));
 
-    this.props.onMouseDragStart?.(e);
+    if (this.props.onMouseDragStart) {
+      this.props.onMouseDragStart(e);
+    }
   };
 
   private handleMouseDragEnd: MouseDragEventHandler = e => {
     // Дожидаемся onMouseUp
     setTimeout(() => {
       this.dragging = false;
-      this.props.onMouseDragEnd?.(e);
+
+      if (this.props.onMouseDragEnd) {
+        this.props.onMouseDragEnd(e);
+      }
     }, 0);
 
-    const theme = this.context;
-    document.documentElement.classList.remove(jsStyles.userSelectNone(theme));
+    document.documentElement.classList.remove(jsStyles.userSelectNone(this.theme));
   };
 
   private handleFocus = (e: React.FocusEvent<HTMLElement>) => {
@@ -349,7 +366,10 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
     }
 
     this.setState({ focused: true });
-    this.props.onFocus?.(e);
+
+    if (this.props.onFocus) {
+      this.props.onFocus(e);
+    }
   };
 
   private handleBlur = (e: React.FocusEvent<HTMLElement>) => {
@@ -369,7 +389,10 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
     removeAllSelections();
 
     this.setState({ focused: false });
-    this.props.onBlur?.(e);
+
+    if (this.props.onBlur) {
+      this.props.onBlur(e);
+    }
   };
 
   private hiddenInputRef = (el: HTMLInputElement | null) => {
@@ -377,7 +400,9 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
   };
 
   private innerRef = (el: HTMLElement | null) => {
-    this.props.innerRef?.(el);
+    if (this.props.innerRef) {
+      this.props.innerRef(el);
+    }
     this.node = el;
   };
 
@@ -387,24 +412,22 @@ export class InputLikeText extends React.Component<InputLikeTextProps, InputLike
   };
 
   private getSizeClassName = () => {
-    const theme = this.context;
-
     switch (this.props.size) {
       case 'large':
         return {
-          [jsInputStyles.sizeLarge(theme)]: true,
-          [jsInputStyles.sizeLargeFallback(theme)]: isIE11 || isEdge,
+          [jsInputStyles.sizeLarge(this.theme)]: true,
+          [jsInputStyles.sizeLargeFallback(this.theme)]: isIE11 || isEdge,
         };
       case 'medium':
         return {
-          [jsInputStyles.sizeMedium(theme)]: true,
-          [jsInputStyles.sizeMediumFallback(theme)]: isIE11 || isEdge,
+          [jsInputStyles.sizeMedium(this.theme)]: true,
+          [jsInputStyles.sizeMediumFallback(this.theme)]: isIE11 || isEdge,
         };
       case 'small':
       default:
         return {
-          [jsInputStyles.sizeSmall(theme)]: true,
-          [jsInputStyles.sizeSmallFallback(theme)]: isIE11 || isEdge,
+          [jsInputStyles.sizeSmall(this.theme)]: true,
+          [jsInputStyles.sizeSmallFallback(this.theme)]: isIE11 || isEdge,
         };
     }
   };

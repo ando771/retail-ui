@@ -1,7 +1,7 @@
 import React, { ReactNode, useContext } from 'react';
 
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
 
 import { jsStyles } from './MenuHeader.styles';
 import styles from './MenuHeader.module.less';
@@ -30,7 +30,6 @@ MenuHeader.__MENU_HEADER__ = true;
 
 export { MenuHeader };
 
-// TODO это какая-то фигата
 export const isMenuHeader = (child: React.ReactNode): child is React.ReactElement<MenuHeaderProps> => {
   return React.isValidElement<MenuHeaderProps>(child) ? child.type.hasOwnProperty('__MENU_HEADER__') : false;
 };

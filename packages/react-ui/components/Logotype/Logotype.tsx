@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import warning from 'warning';
 
 import { stopPropagation } from '../../lib/events/stopPropagation';
-import { locale } from '../Locale/decorators';
+import { locale } from '../../lib/locale/decorators';
 import { Nullable } from '../../typings/utility-types';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 import { CloudIcon } from '../internal/icons/CloudIcon';
 import { ArrowChevronDownIcon } from '../internal/icons/16px';
 
@@ -91,9 +92,8 @@ export class Logotype extends React.Component<LogotypeProps> {
     component: 'a',
     href: '/',
   };
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
 
+  private theme!: Theme;
   private readonly locale!: LogotypeLocale;
   private logoWrapper: Nullable<HTMLElement> = null;
   private isWidgetInited = false;
@@ -121,7 +121,17 @@ export class Logotype extends React.Component<LogotypeProps> {
   }
 
   public render(): JSX.Element {
-    const theme = this.context;
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const {
       color,
       textColor,
@@ -150,7 +160,7 @@ export class Logotype extends React.Component<LogotypeProps> {
           <Component
             href={href}
             tabIndex="-1"
-            className={cx(styles.root, jsStyles.root(theme))}
+            className={cx(styles.root, jsStyles.root(this.theme))}
             style={{ fontSize: `${size}px` }}
           >
             <span style={{ color: textColor }}>{propLocale.prefix}</span>
@@ -163,7 +173,7 @@ export class Logotype extends React.Component<LogotypeProps> {
             </span>
             {suffix && <span style={{ color }}>{suffix}</span>}
           </Component>
-          {withWidget && <span className={cx(styles.divider, jsStyles.divider(theme))} />}
+          {withWidget && <span className={cx(styles.divider, jsStyles.divider(this.theme))} />}
         </span>
         {withWidget && (
           <button className={styles.button} onClick={onArrowClick}>

@@ -20,7 +20,8 @@ import { Token, TokenProps } from '../Token';
 import { MenuItemState } from '../MenuItem';
 import { emptyHandler } from '../../lib/utils';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 
 import { jsStyles } from './TokenInput.styles';
 import styles from './TokenInput.module.less';
@@ -99,8 +100,6 @@ export class TokenInput<T = string> extends React.PureComponent<TokenInputProps<
     onMouseEnter: emptyHandler,
     onMouseLeave: emptyHandler,
   };
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
 
   public state: TokenInputState<T> = {
     inputValue: '',
@@ -108,6 +107,7 @@ export class TokenInput<T = string> extends React.PureComponent<TokenInputProps<
     activeTokens: [],
   };
 
+  private theme!: Theme;
   private input: HTMLInputElement | null = null;
   private tokensInputMenu: TokenInputMenu<T> | null = null;
   private textHelper: TextWidthHelper | null = null;
@@ -144,6 +144,17 @@ export class TokenInput<T = string> extends React.PureComponent<TokenInputProps<
   }
 
   public render() {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     if (this.type !== TokenInputType.WithoutReference && !this.props.getItems) {
       throw Error('Missed getItems for type ' + this.type);
     }
@@ -179,7 +190,7 @@ export class TokenInput<T = string> extends React.PureComponent<TokenInputProps<
       caretColor: this.isCursorVisible ? undefined : 'transparent',
     };
 
-    const theme = this.context;
+    const theme = this.theme;
     const labelClassName = cx(styles.label, jsStyles.label(theme), {
       [jsStyles.labelFocused(theme)]: !!inFocus,
       [jsStyles.error(theme)]: !!error,

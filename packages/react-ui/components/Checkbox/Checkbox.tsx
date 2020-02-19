@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import { Nullable, Override } from '../../typings/utility-types';
 import { tabListener } from '../../lib/events/tabListener';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
 import { OkIcon, SquareIcon } from '../internal/icons/16px';
 import { isEdge, isFirefox, isIE11 } from '../../lib/utils';
 
@@ -56,14 +57,13 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
     onMouseLeave: PropTypes.func,
     onMouseOver: PropTypes.func,
   };
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
 
   public state = {
     focusedByTab: false,
     indeterminate: this.props.initialIndeterminate || false,
   };
 
+  private theme!: Theme;
   private input: Nullable<HTMLInputElement>;
 
   public componentDidMount = () => {
@@ -76,6 +76,17 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
     if (nextProps.checked !== this.props.checked) {
       this.resetIndeterminate();
     }
+  }
+
+  public render() {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
   }
 
   /**
@@ -119,8 +130,7 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
     }
   };
 
-  public render() {
-    const theme = this.context;
+  private renderMain() {
     const props = this.props;
     const {
       children,
@@ -138,21 +148,21 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
     } = props;
     const isIndeterminate = this.state.indeterminate;
 
-    const rootClass = cx(classes.root, jsStyles.root(theme), {
+    const rootClass = cx(classes.root, jsStyles.root(this.theme), {
       [jsStyles.rootFallback()]: isIE11 || isEdge,
       [classes.disabled]: !!props.disabled,
-      [jsStyles.disabled(theme)]: !!props.disabled,
-      [jsStyles.checked(theme)]: !!props.checked,
-      [jsStyles.indeterminate(theme)]: isIndeterminate,
-      [jsStyles.focus(theme)]: this.state.focusedByTab,
-      [jsStyles.warning(theme)]: !!props.warning,
-      [jsStyles.error(theme)]: !!props.error,
+      [jsStyles.disabled(this.theme)]: !!props.disabled,
+      [jsStyles.checked(this.theme)]: !!props.checked,
+      [jsStyles.indeterminate(this.theme)]: isIndeterminate,
+      [jsStyles.focus(this.theme)]: this.state.focusedByTab,
+      [jsStyles.warning(this.theme)]: !!props.warning,
+      [jsStyles.error(this.theme)]: !!props.error,
     });
 
     const inputProps = {
       ...rest,
       type: 'checkbox',
-      className: jsStyles.input(theme),
+      className: jsStyles.input(this.theme),
       onChange: this.handleChange,
       onFocus: this.handleFocus,
       onBlur: this.handleBlur,
@@ -161,7 +171,7 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
 
     let caption = null;
     if (children) {
-      const captionClass = cx(jsStyles.caption(theme), {
+      const captionClass = cx(jsStyles.caption(this.theme), {
         [jsStyles.captionIE11()]: isIE11 || isEdge,
       });
       caption = <span className={captionClass}>{children}</span>;
@@ -173,7 +183,7 @@ export class Checkbox extends React.Component<CheckboxProps, CheckboxState> {
     });
 
     const box = (
-      <span className={cx(classes.box, jsStyles.box(theme))}>
+      <span className={cx(classes.box, jsStyles.box(this.theme))}>
         {(isIndeterminate && <SquareIcon className={iconClass} />) || <OkIcon className={iconClass} />}
       </span>
     );

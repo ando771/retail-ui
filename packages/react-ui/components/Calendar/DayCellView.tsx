@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 
 import { Nullable } from '../../typings/utility-types';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
 
 import * as CDS from './CalendarDateShape';
 import { config } from './config';

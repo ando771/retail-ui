@@ -6,8 +6,8 @@ import { InternalDateOrder, InternalDateSeparator } from '../../../lib/date/type
 import { Gapped } from '../../Gapped';
 import { Select } from '../../Select';
 import { DateInput, DateInputProps } from '../DateInput';
-import { LangCodes, LocaleContext } from '../../Locale';
-import { defaultLangCode } from '../../Locale/constants';
+import { LangCodes, LocaleContext } from '../../../lib/locale';
+import { defaultLangCode } from '../../../lib/locale/constants';
 
 interface DateInputFormattingState {
   order: InternalDateOrder;

@@ -2,7 +2,7 @@ import React from 'react';
 
 import * as LayoutEvents from '../../lib/LayoutEvents';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
 import { Theme } from '../../lib/theming/Theme';
 
 import { jsStyles } from './SidePage.styles';

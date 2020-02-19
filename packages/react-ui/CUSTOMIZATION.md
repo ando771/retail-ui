@@ -132,18 +132,18 @@ const darkTheme = {
 Это позволяет упростить создание собственных тем - достаточно передать только измененные переменные, и не нужно тянуть к себе `ThemeFactory`:
 
 ```jsx harmony static
-import { Button, ButtonProps, Gapped, ThemeProvider } from '@skbkontur/react-ui';
+import { Button, ButtonProps, Gapped, ThemeContext, ThemeFactory } from '@skbkontur/react-ui';
 
-const myTheme = { btnBorderRadius: '10px' };
+const myTheme = ThemeFactory.create({ btnBorderRadius: '10px' });
 
 export const MyComponent = (props: { ok: ButtonProps, cancel: ButtonProps }) => {
   return (
-    <ThemeProvider value={myTheme}>
+    <ThemeContext.Provider value={myTheme}>
       <Gapped>
         <Button {...props.ok}>My round OK button</Button>
         <Button {...props.cancel}>My round Cancel button</Button>
       </Gapped>
-    </ThemeProvider>
+    </ThemeContext.Provider>
   );
 };
 ```
@@ -192,7 +192,7 @@ export const jsStyles = {
 class MyComponent extends React.Component<{}, {}> {
   public render() {
     return (
-      <ThemeConsumer>
+      <ThemeContext.Consumer>
         {theme => {
           this.theme = theme;
           return this.renderMain();
@@ -251,13 +251,13 @@ private _renderCircle = (type) => {
    В начале времен, где-то в _App.(j|t)sx_
 
 ```jsx harmony static
-import { ThemeProvider } from '@skbkontur/react-ui';
+import { ThemeContext } from '@skbkontur/react-ui';
 import { FLAT_THEME } from '@skbkontur/react-ui/lib/theming/themes/FlatTheme';
 
 const App = (
-  <ThemeProvider value={FLAT_THEME}>
+  <ThemeContext.Provider value={FLAT_THEME}>
     <div />
-  </ThemProvider>
+  </ThemeContext.Provider>
 );
 ```
 

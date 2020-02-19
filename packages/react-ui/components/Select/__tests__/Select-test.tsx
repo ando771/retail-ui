@@ -1,8 +1,8 @@
 import { mount } from 'enzyme';
 import React from 'react';
 
-import { defaultLangCode } from '../../Locale/constants';
-import { LangCodes, LocaleContext } from '../../Locale';
+import { defaultLangCode } from '../../../lib/locale/constants';
+import { LangCodes, LocaleContext } from '../../../lib/locale';
 import { SelectLocaleHelper } from '../locale';
 import { Select } from '../Select';
 

@@ -13,7 +13,8 @@ import * as safePropTypes from '../../lib/SSRSafePropTypes';
 import { FocusEventType, MouseEventType } from '../../typings/event-types';
 import { isFunction, isIE11, isEdge } from '../../lib/utils';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 
 import styles from './Popup.module.less';
 import { PopupPin } from './PopupPin';
@@ -177,10 +178,8 @@ export class Popup extends React.Component<PopupProps, PopupState> {
     ignoreHover: false,
   };
 
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
-
   public state: PopupState = { location: this.props.opened ? DUMMY_LOCATION : null };
+  private theme!: Theme;
   private layoutEventsToken: Nullable<ReturnType<typeof LayoutEvents.addListener>>;
   private locationUpdateId: Nullable<number> = null;
   private lastPopupElement: Nullable<HTMLElement>;
@@ -222,6 +221,17 @@ export class Popup extends React.Component<PopupProps, PopupState> {
   }
 
   public render() {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const { location } = this.state;
     const { anchorElement, useWrapper } = this.props;
 
@@ -318,7 +328,6 @@ export class Popup extends React.Component<PopupProps, PopupState> {
 
   private renderContent(location: PopupLocation) {
     const { backgroundColor, disableAnimations, maxWidth, hasShadow, ignoreHover, opened } = this.props;
-    const theme = this.context;
     const children = this.renderChildren();
 
     const { direction } = PopupHelper.getPositionObject(location.position);
@@ -339,9 +348,9 @@ export class Popup extends React.Component<PopupProps, PopupState> {
           <ZIndex
             ref={this.refPopupElement}
             priority={'Popup'}
-            className={cx([styles.popup, jsStyles.popup(theme)], {
-              [jsStyles.shadow(theme)]: hasShadow,
-              [jsStyles.shadowFallback(theme)]: hasShadow && (isIE11 || isEdge),
+            className={cx([styles.popup, jsStyles.popup(this.theme)], {
+              [jsStyles.shadow(this.theme)]: hasShadow,
+              [jsStyles.shadowFallback(this.theme)]: hasShadow && (isIE11 || isEdge),
               [styles['popup-ignore-hover']]: ignoreHover,
               ...(disableAnimations
                 ? {}
@@ -356,9 +365,9 @@ export class Popup extends React.Component<PopupProps, PopupState> {
             onMouseEnter={this.handleMouseEnter}
             onMouseLeave={this.handleMouseLeave}
           >
-            <div className={cx(styles.content, jsStyles.content(theme))} data-tid={'PopupContent'}>
+            <div className={cx(styles.content, jsStyles.content(this.theme))} data-tid={'PopupContent'}>
               <div
-                className={jsStyles.contentInner(theme)}
+                className={jsStyles.contentInner(this.theme)}
                 style={{ backgroundColor }}
                 data-tid={'PopupContentInner'}
               >
@@ -388,14 +397,13 @@ export class Popup extends React.Component<PopupProps, PopupState> {
   };
 
   private renderPin(position: string): React.ReactNode {
-    const theme = this.context;
     /**
      * Box-shadow does not appear under the pin. Borders are used instead.
      * In non-ie browsers drop-shadow filter is used. It is applying
      * shadow to the pin too.
      */
-    const isDefaultBorderColor = theme.popupBorderColor === POPUP_BORDER_DEFAULT_COLOR;
-    const pinBorder = isIE11 && isDefaultBorderColor ? 'rgba(0, 0, 0, 0.09)' : theme.popupBorderColor;
+    const isDefaultBorderColor = this.theme.popupBorderColor === POPUP_BORDER_DEFAULT_COLOR;
+    const pinBorder = isIE11 && isDefaultBorderColor ? 'rgba(0, 0, 0, 0.09)' : this.theme.popupBorderColor;
 
     const { pinSize, pinOffset, hasShadow, backgroundColor, borderColor } = this.props;
 
@@ -407,7 +415,7 @@ export class Popup extends React.Component<PopupProps, PopupState> {
           size={pinSize}
           offset={pinOffset}
           borderWidth={hasShadow ? 1 : 0}
-          backgroundColor={backgroundColor || theme.popupBackground}
+          backgroundColor={backgroundColor || this.theme.popupBackground}
           borderColor={borderColor || pinBorder}
         />
       )

@@ -1,9 +1,9 @@
 import warning from 'warning';
 import React, { ReactNode } from 'react';
 
-import { defaultLangCode } from '../Locale/constants';
-import { LangCodes, LocaleControls } from '../Locale/types';
-import { LocaleContext } from '../Locale';
+import { defaultLangCode } from '../../lib/locale/constants';
+import { LangCodes, LocaleControls } from '../../lib/locale/types';
+import { LocaleContext } from '../../lib/locale';
 
 export interface LocaleProviderProps {
   locale?: LocaleControls;

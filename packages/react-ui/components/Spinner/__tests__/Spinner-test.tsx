@@ -1,8 +1,8 @@
 import { mount, ReactWrapper } from 'enzyme';
 import React from 'react';
 
-import { defaultLangCode } from '../../Locale/constants';
-import { LangCodes, LocaleContext } from '../../Locale';
+import { defaultLangCode } from '../../../lib/locale/constants';
+import { LangCodes, LocaleContext } from '../../../lib/locale';
 import { SpinnerLocaleHelper } from '../locale';
 import { sizes } from '../../internal/icons/SpinnerIcon';
 import { Spinner } from '../Spinner';

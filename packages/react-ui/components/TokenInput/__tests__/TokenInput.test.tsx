@@ -1,8 +1,8 @@
 import { mount, ReactWrapper } from 'enzyme';
 import React from 'react';
 
-import { defaultLangCode } from '../../Locale/constants';
-import { LangCodes, LocaleContext, LocaleContextProps } from '../../Locale';
+import { defaultLangCode } from '../../../lib/locale/constants';
+import { LangCodes, LocaleContext, LocaleContextProps } from '../../../lib/locale';
 import { delay } from '../../../lib/utils';
 import styles from '../../MenuItem/MenuItem.less';
 import { TokenInputLocaleHelper } from '../locale';

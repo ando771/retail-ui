@@ -2,7 +2,8 @@ import React from 'react';
 import ReactInputMask, { InputState, MaskOptions } from 'react-input-mask';
 
 import { cx } from '../../../lib/theming/Emotion';
-import { ThemeContext } from '../../ThemeContext';
+import { ThemeContext } from '../../../lib/theming/ThemeContext';
+import { Theme } from '../../../lib/theming/Theme';
 
 import { jsStyles } from './MaskedInput.styles';
 import styles from './MaskedInput.module.less';
@@ -26,9 +27,9 @@ interface MaskedInputState {
 
 export class MaskedInput extends React.Component<MaskedInputProps, MaskedInputState> {
   public static __KONTUR_REACT_UI__ = 'MaskedInput';
-  static contextType = ThemeContext;
 
   public input: HTMLInputElement | null = null;
+  private theme!: Theme;
   private reactInputMask: ReactInputMask | null = null;
 
   public constructor(props: MaskedInputProps) {
@@ -57,6 +58,17 @@ export class MaskedInput extends React.Component<MaskedInputProps, MaskedInputSt
   }
 
   public render() {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const {
       maskChar,
       alwaysShowMask,
@@ -68,7 +80,6 @@ export class MaskedInput extends React.Component<MaskedInputProps, MaskedInputSt
       defaultValue,
       ...inputProps
     } = this.props;
-    const theme = this.context;
 
     return (
       <span className={styles.container}>
@@ -85,7 +96,7 @@ export class MaskedInput extends React.Component<MaskedInputProps, MaskedInputSt
           ref={this.refMaskedInput}
         />
         {this.isMaskVisible() && (
-          <span className={cx(styles.inputMask, jsStyles.inputMask(theme))}>
+          <span className={cx(styles.inputMask, jsStyles.inputMask(this.theme))}>
             <span style={{ color: 'transparent' }}>{this.state.emptyValue.slice(0, this.state.value.length)}</span>
             {this.state.emptyValue.slice(this.state.value.length)}
           </span>

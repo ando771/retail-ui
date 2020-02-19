@@ -2,8 +2,8 @@ import { mount, ReactWrapper } from 'enzyme';
 import React from 'react';
 
 import { emptyHandler } from '../../../lib/utils';
-import { defaultLangCode } from '../../Locale/constants';
-import { LangCodes, LocaleContext } from '../../Locale';
+import { defaultLangCode } from '../../../lib/locale/constants';
+import { LangCodes, LocaleContext } from '../../../lib/locale';
 import { PagingLocaleHelper } from '../locale';
 import { Paging } from '../Paging';
 import PagingStyles from '../Paging.less';

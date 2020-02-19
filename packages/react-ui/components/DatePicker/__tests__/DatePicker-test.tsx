@@ -8,10 +8,10 @@ import { Calendar } from '../../Calendar';
 import styles from '../../DatePicker/Picker.less';
 import { DateSelect } from '../../DateSelect';
 import { DropdownContainer } from '../../DropdownContainer/DropdownContainer';
-import { defaultLangCode } from '../../Locale/constants';
+import { defaultLangCode } from '../../../lib/locale/constants';
 import { DatePicker, DatePickerProps } from '../DatePicker';
 import { DatePickerLocaleHelper } from '../locale';
-import { LangCodes, LocaleControls, LocaleContext } from '../../Locale';
+import { LangCodes, LocaleControls, LocaleContext } from '../../../lib/locale';
 
 const handleChange = () => undefined;
 const renderDatePicker = (props: Partial<DatePickerProps<string>> = {}) =>

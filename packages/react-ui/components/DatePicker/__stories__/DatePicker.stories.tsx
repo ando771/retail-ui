@@ -8,8 +8,8 @@ import { Gapped } from '../../Gapped';
 import { MockDate } from '../../internal/MockDate';
 import { Tooltip } from '../../Tooltip';
 import { DatePicker } from '../DatePicker';
-import { LocaleContext, LangCodes } from '../../Locale';
-import { defaultLangCode } from '../../Locale/constants';
+import { LocaleContext, LangCodes } from '../../../lib/locale';
+import { defaultLangCode } from '../../../lib/locale/constants';
 
 class DatePickerWithError extends React.Component<any, any> {
   public state = {

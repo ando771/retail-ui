@@ -2,8 +2,8 @@ import React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
 
 import { CustomComboBoxLocaleHelper } from '../../CustomComboBox/locale';
-import { LangCodes, LocaleContext } from '../../Locale';
-import { defaultLangCode } from '../../Locale/constants';
+import { LangCodes, LocaleContext } from '../../../lib/locale';
+import { defaultLangCode } from '../../../lib/locale/constants';
 import { ComboBox, ComboBoxProps } from '../ComboBox';
 import { InputLikeText } from '../../internal/InputLikeText';
 import { MenuItem } from '../../MenuItem';

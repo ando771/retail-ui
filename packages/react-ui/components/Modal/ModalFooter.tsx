@@ -3,7 +3,7 @@ import React, { ReactNode, useContext, useState } from 'react';
 import { getScrollWidth } from '../../lib/dom/getScrollWidth';
 import { Sticky } from '../Sticky';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
 import { ZIndex } from '../ZIndex';
 
 import { jsStyles } from './Modal.styles';

@@ -1,4 +1,4 @@
-import { LangCodes } from '../../components/Locale';
+import { LangCodes } from '../locale';
 
 import {
   InternalDateDayWeek,

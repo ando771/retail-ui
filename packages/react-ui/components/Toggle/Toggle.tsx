@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 
 import { tabListener } from '../../lib/events/tabListener';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 
 import styles from './Toggle.module.less';
 import { jsStyles } from './Toggle.styles';
@@ -46,10 +47,8 @@ export class Toggle extends React.Component<ToggleProps, ToggleState> {
     loading: false,
   };
 
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
-
-  private inputEL = React.createRef<HTMLInputElement>();
+  private theme!: Theme;
+  private input: HTMLInputElement | null = null;
 
   constructor(props: ToggleProps) {
     super(props);
@@ -71,29 +70,39 @@ export class Toggle extends React.Component<ToggleProps, ToggleState> {
    * @public
    */
   public focus = () => {
-    if (this.inputEL.current) {
+    if (this.input) {
       tabListener.isTabPressed = true;
-      this.inputEL.current.focus();
+      this.input.focus();
     }
   };
 
   public render() {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const { warning, error, loading, color } = this.props;
-    const theme = this.context;
     const disabled = this.props.disabled || loading;
     const checked = this.isUncontrolled() ? this.state.checked : this.props.checked;
 
-    const containerClassNames = cx(styles.container, jsStyles.container(theme), {
+    const containerClassNames = cx(styles.container, jsStyles.container(this.theme), {
       [styles.isLoading]: !!loading,
-      [jsStyles.focused(theme)]: !disabled && !!this.state.focusByTab,
-      [jsStyles.isLoading(theme)]: !!loading,
-      [jsStyles.isWarning(theme)]: !color && !!warning,
-      [jsStyles.isError(theme)]: !color && !!error,
+      [jsStyles.focused(this.theme)]: !disabled && !!this.state.focusByTab,
+      [jsStyles.isLoading(this.theme)]: !!loading,
+      [jsStyles.isWarning(this.theme)]: !color && !!warning,
+      [jsStyles.isError(this.theme)]: !color && !!error,
     });
 
     return (
       <label
-        className={cx(styles.wrapper, jsStyles.wrapper(theme), {
+        className={cx(styles.wrapper, jsStyles.wrapper(this.theme), {
           [styles.isDisabled]: !!disabled,
         })}
       >
@@ -104,7 +113,7 @@ export class Toggle extends React.Component<ToggleProps, ToggleState> {
           className={styles.input}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
-          ref={this.inputEL}
+          ref={this.inputRef}
           disabled={disabled}
         />
         <div
@@ -119,17 +128,23 @@ export class Toggle extends React.Component<ToggleProps, ToggleState> {
           }
         >
           <div
-            className={cx(styles.activeBackground, jsStyles.activeBackground(theme))}
+            className={cx(styles.activeBackground, jsStyles.activeBackground(this.theme))}
             style={checked && color ? { backgroundColor: color } : undefined}
           />
         </div>
-        <div className={cx(styles.handle, jsStyles.handle(theme))} />
+        <div className={cx(styles.handle, jsStyles.handle(this.theme))} />
       </label>
     );
   }
 
+  private inputRef = (element: HTMLInputElement) => {
+    this.input = element;
+  };
+
   private handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.onValueChange?.(event.target.checked);
+    if (this.props.onValueChange) {
+      this.props.onValueChange(event.target.checked);
+    }
 
     if (this.isUncontrolled()) {
       this.setState({
@@ -137,11 +152,15 @@ export class Toggle extends React.Component<ToggleProps, ToggleState> {
       });
     }
 
-    this.props.onChange?.(event);
+    if (this.props.onChange) {
+      this.props.onChange(event);
+    }
   };
 
   private handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
-    this.props.onFocus?.(event);
+    if (this.props.onFocus) {
+      this.props.onFocus(event);
+    }
 
     if (tabListener.isTabPressed) {
       this.setState({ focusByTab: true });
@@ -149,7 +168,9 @@ export class Toggle extends React.Component<ToggleProps, ToggleState> {
   };
 
   private handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    this.props.onBlur?.(event);
+    if (this.props.onBlur) {
+      this.props.onBlur(event);
+    }
     this.setState({
       focusByTab: false,
     });

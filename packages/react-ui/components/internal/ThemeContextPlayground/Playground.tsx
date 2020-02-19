@@ -13,7 +13,7 @@ import { Tabs } from '../../Tabs';
 import { Gapped } from '../../Gapped';
 import { Link, LinkProps } from '../../Link';
 import { Input, InputProps } from '../../Input';
-import { ThemeContext } from '../../ThemeContext';
+import { ThemeContext } from '../../../lib/theming/ThemeContext';
 import { Tooltip } from '../../Tooltip';
 import { Sticky } from '../../Sticky';
 
@@ -33,7 +33,7 @@ import { RadioPlayground } from './RadioPlayground';
 import { PagingPlayground } from './PagingPlayground';
 import { HintPlayground } from './HintPlayground';
 import { ComponentsGroup } from './ComponentsGroup';
-import { PlaygroundTheme } from './ThemeProviderPlayground';
+import { PlaygroundTheme } from './ThemeContextPlayground';
 
 const useSticky = process.env.enableReactTesting !== 'true';
 
@@ -44,15 +44,21 @@ export interface ComponentsListProps {
 }
 
 export class Playground extends React.Component<ComponentsListProps, {}> {
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
-
+  private theme!: PlaygroundTheme;
   private stopEl = React.createRef<HTMLDivElement>();
 
   public render() {
-    const theme = this.context as PlaygroundTheme;
-
-    const wrapperClassName = cx(styles.playground, jsStyles.playgroundWrapper(theme));
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme as PlaygroundTheme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+  private renderMain() {
+    const wrapperClassName = cx(styles.playground, jsStyles.playgroundWrapper(this.theme));
     return (
       <div className={wrapperClassName}>
         <Gapped vertical gap={50}>
@@ -88,16 +94,14 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
 
   private renderTabs() {
     const { currentThemeType, onThemeChange, onEditLinkClick } = this.props;
-    const theme = this.context as PlaygroundTheme;
-
-    const tabsOuterWrapperStyle = { background: theme.backgroundMain || 'white' };
-    const tabsOuterWrapperClass = cx(styles.tabsWrapper, useSticky && jsStyles.stickyTabsWrapper(theme));
+    const tabsOuterWrapperStyle = { background: this.theme.backgroundMain || 'white' };
+    const tabsOuterWrapperClass = cx(styles.tabsWrapper, useSticky && jsStyles.stickyTabsWrapper(this.theme));
 
     return (
       <div style={tabsOuterWrapperStyle} className={tabsOuterWrapperClass}>
         <Gapped gap={40}>
           <Tabs value={currentThemeType} onValueChange={onThemeChange} vertical={false}>
-            <div className={jsStyles.tabsInnerWrapper(theme)}>
+            <div className={jsStyles.tabsInnerWrapper(this.theme)}>
               <Tabs.Tab id={ThemeType.Default}>Дефолтная</Tabs.Tab>
               <Tabs.Tab id={ThemeType.Flat}>Плоская</Tabs.Tab>
               <Tabs.Tab id={ThemeType.Dark}>Темная</Tabs.Tab>
@@ -110,8 +114,6 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
   }
 
   private renderSizesGroup = () => {
-    const theme = this.context;
-
     const Group = ({ size }: { size: 'small' | 'medium' | 'large' }) => (
       <Gapped wrap verticalAlign="middle" gap={10}>
         <SelectPlayground width={120} size={size} />
@@ -126,7 +128,7 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
     );
 
     return (
-      <ComponentsGroup title={'Размеры'} theme={theme}>
+      <ComponentsGroup title={'Размеры'} theme={this.theme}>
         <Group size={'small'} />
         <Group size={'medium'} />
         <Group size={'large'} />
@@ -135,8 +137,6 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
   };
 
   private renderLinksGroup = () => {
-    const theme = this.context;
-
     const propsList: LinkProps[] = [
       { icon: <LinkIcon />, children: 'Enabled' },
       { icon: <OkIcon />, use: 'success', children: 'Success' },
@@ -145,7 +145,7 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
       { icon: <TrashIcon />, children: 'Disabled', disabled: true },
     ];
     return (
-      <ComponentsGroup title={'Ссылки'} theme={theme}>
+      <ComponentsGroup title={'Ссылки'} theme={this.theme}>
         <Gapped wrap verticalAlign="middle" gap={10}>
           {getComponentsFromPropsList(<Link />, propsList)}
         </Gapped>
@@ -166,7 +166,7 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
     ];
 
     return (
-      <ComponentsGroup title={'Кнопки'} theme={this.context}>
+      <ComponentsGroup title={'Кнопки'} theme={this.theme}>
         {getComponentsFromPropsList(<Button width={120} size={'small'} />, propsList)}
       </ComponentsGroup>
     );
@@ -181,7 +181,7 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
     ];
     const fromProps = getComponentsFromPropsList(<Input width={120} />, propsList);
     return (
-      <ComponentsGroup title={'Поле ввода'} theme={this.context}>
+      <ComponentsGroup title={'Поле ввода'} theme={this.theme}>
         <Input width={380} prefix="https://kontur.ru/search?query=" rightIcon={<SearchIcon />} />
         <div>
           <Gapped gap={10}>{fromProps}</Gapped>
@@ -192,7 +192,7 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
 
   private renderTokenInputsGroup = () => {
     return (
-      <ComponentsGroup title={'Поле с токеном'} theme={this.context}>
+      <ComponentsGroup title={'Поле с токеном'} theme={this.theme}>
         <TokenInputPlayground />
       </ComponentsGroup>
     );
@@ -200,7 +200,7 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
 
   private renderOtherInputsGroup = () => {
     return (
-      <ComponentsGroup title={'Прочие поля'} theme={this.context}>
+      <ComponentsGroup title={'Прочие поля'} theme={this.theme}>
         <CurrencyInputPlayground />
         <FxInputPlayground />
         <DatePickerPlayground />
@@ -210,7 +210,7 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
 
   private renderSwitchersGroup = () => {
     return (
-      <ComponentsGroup title={'Переключатели'} theme={this.context}>
+      <ComponentsGroup title={'Переключатели'} theme={this.theme}>
         <SwitcherPlayground />
       </ComponentsGroup>
     );
@@ -218,7 +218,7 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
 
   private renderControlsGroup = () => {
     return (
-      <ComponentsGroup title={'Радио, чекбоксы'} theme={this.context}>
+      <ComponentsGroup title={'Радио, чекбоксы'} theme={this.theme}>
         <Gapped verticalAlign={'top'} gap={60}>
           <CheckboxPlayground />
           <RadioPlayground />
@@ -230,7 +230,7 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
 
   private renderHintsGroup = () => {
     return (
-      <ComponentsGroup title={'Тултип'} theme={this.context}>
+      <ComponentsGroup title={'Тултип'} theme={this.theme}>
         <HintPlayground />
       </ComponentsGroup>
     );
@@ -243,7 +243,7 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
       </div>
     );
     return (
-      <ComponentsGroup title={'Тултип'} theme={this.context}>
+      <ComponentsGroup title={'Тултип'} theme={this.theme}>
         <Tooltip render={tooltipContent} pos="right middle" trigger={'opened'} disableAnimations={true}>
           <Link icon={<HelpDotIcon />} />
         </Tooltip>
@@ -253,7 +253,7 @@ export class Playground extends React.Component<ComponentsListProps, {}> {
 
   private renderPaging = () => {
     return (
-      <ComponentsGroup title={'Пейджинг'} theme={this.context}>
+      <ComponentsGroup title={'Пейджинг'} theme={this.theme}>
         <PagingPlayground />
       </ComponentsGroup>
     );

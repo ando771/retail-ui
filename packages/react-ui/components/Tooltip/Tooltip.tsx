@@ -9,7 +9,8 @@ import { Nullable } from '../../typings/utility-types';
 import { MouseEventType } from '../../typings/event-types';
 import { containsTargetOrRenderContainer } from '../../lib/listenFocusOutside';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 
 import { jsStyles } from './Tooltip.styles';
 import styles from './Tooltip.module.less';
@@ -177,13 +178,11 @@ export class Tooltip extends React.PureComponent<TooltipProps, TooltipState> {
     closeOnChildrenMouseLeave: false,
   };
 
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
-
   public static delay = 100;
   private static triggersWithoutCloseButton: TooltipTrigger[] = ['hover', 'hoverAnchor', 'focus', 'hover&focus'];
 
   public state: TooltipState = { opened: false, focused: false };
+  private theme!: Theme;
   private hoverTimeout: Nullable<number> = null;
   private contentElement: Nullable<HTMLElement> = null;
   private positions: Nullable<PopupPosition[]> = null;
@@ -208,6 +207,48 @@ export class Tooltip extends React.PureComponent<TooltipProps, TooltipState> {
   }
 
   public render() {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  public renderContent = () => {
+    const content = this.props.render ? this.props.render() : null;
+    if (content == null) {
+      return null;
+    }
+
+    return (
+      <div ref={this.refContent} className={styles.tooltipContent}>
+        {content}
+        {this.renderCloseButton()}
+      </div>
+    );
+  };
+
+  public renderCloseButton() {
+    const hasCross =
+      this.props.closeButton === undefined
+        ? Tooltip.triggersWithoutCloseButton.indexOf(this.props.trigger) === -1
+        : this.props.closeButton;
+
+    if (!hasCross) {
+      return null;
+    }
+
+    return (
+      <div className={cx(styles.cross, jsStyles.cross(this.theme))} onClick={this.handleCloseButtonClick}>
+        <CrossIcon />
+      </div>
+    );
+  }
+
+  private renderMain() {
     const props = this.props;
     const content = this.renderContent();
     const { popupProps, layerProps = { active: false } } = this.getProps();
@@ -239,38 +280,6 @@ export class Tooltip extends React.PureComponent<TooltipProps, TooltipState> {
       >
         {content}
       </Popup>
-    );
-  }
-
-  public renderContent = () => {
-    const content = this.props.render ? this.props.render() : null;
-    if (content == null) {
-      return null;
-    }
-
-    return (
-      <div ref={this.refContent} className={styles.tooltipContent}>
-        {content}
-        {this.renderCloseButton()}
-      </div>
-    );
-  };
-
-  public renderCloseButton() {
-    const hasCross =
-      this.props.closeButton === undefined
-        ? Tooltip.triggersWithoutCloseButton.indexOf(this.props.trigger) === -1
-        : this.props.closeButton;
-
-    if (!hasCross) {
-      return null;
-    }
-
-    const theme = this.context;
-    return (
-      <div className={cx(styles.cross, jsStyles.cross(theme))} onClick={this.handleCloseButtonClick}>
-        <CrossIcon />
-      </div>
     );
   }
 

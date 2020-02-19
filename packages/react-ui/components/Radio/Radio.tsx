@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { Override } from '../../typings/utility-types';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
 import { Theme } from '../../lib/theming/Theme';
 
 import { jsStyles } from './Radio.styles';

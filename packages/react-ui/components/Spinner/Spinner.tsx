@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import warning from 'warning';
 
-import { locale } from '../Locale/decorators';
+import { locale } from '../../lib/locale/decorators';
 import { cx } from '../../lib/theming/Emotion';
+import { Theme } from '../../lib/theming/Theme';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
 import { hasSvgAnimationSupport } from '../../lib/utils';
 import { SpinnerIcon } from '../internal/icons/SpinnerIcon';
 import { SpinnerOld } from '../internal/SpinnerOld';
-import { ThemeContext } from '../ThemeContext';
 
 import { jsStyles } from './Spinner.styles';
 import { SpinnerFallback, types } from './SpinnerFallback';
@@ -68,10 +69,9 @@ export class Spinner extends React.Component<SpinnerProps> {
   public static defaultProps: SpinnerProps = {
     type: 'normal',
   };
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
 
   public static Types: typeof types = types;
+  private theme!: Theme;
   private readonly locale!: SpinnerLocale;
 
   constructor(props: SpinnerProps) {
@@ -80,10 +80,22 @@ export class Spinner extends React.Component<SpinnerProps> {
   }
 
   public render() {
-    const { cloud, type, caption = this.locale.loading, dimmed } = this.props;
-    if (cloud) {
-      return <SpinnerOld {...this.props} />;
-    }
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return !this.props.cloud ? this.renderMain() : this.renderSpinnerOld();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderSpinnerOld() {
+    return <SpinnerOld {...this.props} />;
+  }
+
+  private renderMain() {
+    const { type, caption = this.locale.loading, dimmed } = this.props;
 
     return (
       <div className={jsStyles.spinner()}>
@@ -97,15 +109,13 @@ export class Spinner extends React.Component<SpinnerProps> {
   }
 
   private renderSpinner = (type: SpinnerType, dimmed?: boolean) => {
-    const theme = this.context;
-    const circleClassName = dimmed ? jsStyles.circleDimmed(theme) : jsStyles.circle(theme);
+    const circleClassName = dimmed ? jsStyles.circleDimmed(this.theme) : jsStyles.circle(this.theme);
 
     return <SpinnerIcon size={type} className={circleClassName} />;
   };
 
   private renderCaption = (type: SpinnerType, caption: React.ReactNode) => {
-    const theme = this.context;
-    const captionClassName = cx(jsStyles.caption(type), jsStyles.captionColor(theme));
+    const captionClassName = cx(jsStyles.caption(type), jsStyles.captionColor(this.theme));
     return <span className={captionClassName}>{caption}</span>;
   };
 }

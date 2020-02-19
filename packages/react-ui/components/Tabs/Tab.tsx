@@ -7,7 +7,7 @@ import { tabListener } from '../../lib/events/tabListener';
 import { Nullable } from '../../typings/utility-types';
 import { isFunctionalComponent } from '../../lib/utils';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
 import { Theme } from '../../lib/theming/Theme';
 
 import styles from './Tab.module.less';

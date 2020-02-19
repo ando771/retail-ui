@@ -12,7 +12,7 @@ import {
   isKeyEscape,
   isKeySpace,
 } from '../../lib/events/keyboard/identifiers';
-import { locale } from '../Locale/decorators';
+import { locale } from '../../lib/locale/decorators';
 import { Button, ButtonProps, ButtonSize, ButtonUse } from '../Button';
 import { DropdownContainer } from '../DropdownContainer';
 import { filterProps } from '../filterProps';
@@ -26,7 +26,8 @@ import { createPropsGetter } from '../internal/createPropsGetter';
 import { Nullable } from '../../typings/utility-types';
 import { isFunction } from '../../lib/utils';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 
 import { Item } from './Item';
 import { SelectLocale, SelectLocaleHelper } from './locale';
@@ -199,9 +200,6 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
     use: 'default',
   };
 
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
-
   public static Item = Item;
   public static SEP = () => <MenuSeparator />;
 
@@ -218,6 +216,7 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
     value: this.props.defaultValue,
   };
 
+  private theme!: Theme;
   private readonly locale!: SelectLocale;
   private menu: Nullable<Menu>;
   private buttonElement: FocusableReactElement | null = null;
@@ -232,13 +231,27 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
     }
   }
 
+  public render() {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
   /**
    * @public
    */
   public open = () => {
     if (!this.state.opened) {
       this.setState({ opened: true });
-      this.props.onOpen?.();
+
+      if (this.props.onOpen) {
+        this.props.onOpen();
+      }
     }
   };
 
@@ -248,7 +261,10 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
   public close = () => {
     if (this.state.opened) {
       this.setState({ opened: false });
-      this.props.onClose?.();
+
+      if (this.props.onClose) {
+        this.props.onClose();
+      }
     }
   };
 
@@ -256,10 +272,12 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
    * @public
    */
   public focus = () => {
-    this.buttonElement?.focus?.();
+    if (this.buttonElement && this.buttonElement.focus) {
+      this.buttonElement.focus();
+    }
   };
 
-  public render() {
+  private renderMain() {
     const { label, isPlaceholder } = this.renderLabel();
 
     const buttonParams: ButtonParams = {
@@ -313,8 +331,6 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
   }
 
   private renderDefaultButton(params: ButtonParams) {
-    const theme = this.context;
-
     if (this.props.diadocLinkIcon) {
       warning(false, `diadocLinkIcon has been deprecated`);
       return this.renderLinkButton(params);
@@ -344,7 +360,7 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
         [styles.label]: this.props.use !== 'link',
         [styles.labelWithLeftIcon]: !!this.props._icon,
         [styles.placeholder]: params.isPlaceholder,
-        [jsStyles.placeholder(theme)]: params.isPlaceholder,
+        [jsStyles.placeholder(this.theme)]: params.isPlaceholder,
         [styles.customUsePlaceholder]: params.isPlaceholder && this.props.use !== 'default',
       }),
       style: {
@@ -360,7 +376,7 @@ export class Select<TValue = {}, TItem = {}> extends React.Component<SelectProps
           <span className={styles.labelText}>{params.label}</span>
         </span>
         <div className={styles.arrowWrap}>
-          <div className={cx(styles.arrow, jsStyles.arrow(theme), useIsCustom && styles.customUseArrow)} />
+          <div className={cx(styles.arrow, jsStyles.arrow(this.theme), useIsCustom && styles.customUseArrow)} />
         </div>
       </Button>
     );

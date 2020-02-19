@@ -2,7 +2,7 @@ import React from 'react';
 import isEqual from 'lodash.isequal';
 import warning from 'warning';
 
-import { ThemeContext } from '../ThemeContext/ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext/ThemeContext';
 import { Theme, ThemeIn } from '../../lib/theming/Theme';
 import { ThemeFactory } from '../../lib/theming/ThemeFactory';
 import { isDevelopmentEnv } from '../internal/currentEnvironment';

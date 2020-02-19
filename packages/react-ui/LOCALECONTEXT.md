@@ -90,7 +90,7 @@ const customLocale = {
 </LocaleContext.Provider>;
 ```
 
-Локализация функционального компонента через хуки
+Локализация функционального компонента через useContext.
 
 ```jsx harmony
 import { useContext } from 'react';

@@ -1,8 +1,8 @@
 import { mount, ReactWrapper } from 'enzyme';
 import React from 'react';
 
-import { LangCodes, LocaleContext } from '../../Locale';
-import { defaultLangCode } from '../../Locale/constants';
+import { LangCodes, LocaleContext } from '../../../lib/locale';
+import { defaultLangCode } from '../../../lib/locale/constants';
 import { LogotypeLocaleHelper } from '../locale';
 import { Logotype } from '../Logotype';
 

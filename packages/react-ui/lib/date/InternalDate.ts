@@ -1,4 +1,4 @@
-import { defaultLangCode } from '../../components/Locale/constants';
+import { defaultLangCode } from '../locale/constants';
 
 import { defaultDateComponentsOrder, defaultDateComponentsSeparator, emptyDateComponents } from './constants';
 import { InternalDateCalculator } from './InternalDateCalculator';

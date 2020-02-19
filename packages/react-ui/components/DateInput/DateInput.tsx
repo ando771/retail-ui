@@ -4,10 +4,11 @@ import { ConditionalHandler } from '../../lib/ConditionalHandler';
 import { LENGTH_FULLDATE, MAX_FULLDATE, MIN_FULLDATE } from '../../lib/date/constants';
 import { InternalDateComponentType } from '../../lib/date/types';
 import { cx } from '../../lib/theming/Emotion';
+import { Theme } from '../../lib/theming/Theme';
 import { DatePickerLocale, DatePickerLocaleHelper } from '../DatePicker/locale';
 import { InputLikeText } from '../internal/InputLikeText';
-import { locale } from '../Locale/decorators';
-import { ThemeContext } from '../ThemeContext';
+import { locale } from '../../lib/locale/decorators';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
 import { CalendarIcon } from '../internal/icons/16px';
 
 import { DateFragmentsView } from './DateFragmentsView';
@@ -71,8 +72,6 @@ export class DateInput extends React.Component<DateInputProps, DateInputState> {
     size: 'small',
     width: 125,
   };
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
 
   private iDateMediator: InternalDateMediator = new InternalDateMediator();
   private inputLikeText: InputLikeText | null = null;
@@ -82,6 +81,7 @@ export class DateInput extends React.Component<DateInputProps, DateInputState> {
   private ignoringDelimiter = false;
   private locale!: DatePickerLocale;
   private blurEvent: React.FocusEvent<HTMLElement> | null = null;
+  private theme!: Theme;
   private conditionalHandler = new ConditionalHandler<Actions, [React.KeyboardEvent<HTMLElement>]>()
     .add(Actions.MoveSelectionLeft, () => this.shiftSelection(-1))
     .add(Actions.MoveSelectionRight, () => this.shiftSelection(1))
@@ -160,6 +160,17 @@ export class DateInput extends React.Component<DateInputProps, DateInputState> {
   }
 
   public render() {
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const { focused, selected, inputMode, valueFormatted } = this.state;
     const fragments = focused || valueFormatted !== '' ? this.iDateMediator.getFragments() : [];
 
@@ -197,7 +208,7 @@ export class DateInput extends React.Component<DateInputProps, DateInputState> {
     const { withIcon, size, disabled = false } = this.props;
 
     if (withIcon) {
-      const theme = this.context;
+      const theme = this.theme;
       const iconStyles = cx({
         [jsStyles.icon(theme)]: true,
         [jsStyles.iconSmall(theme)]: size === 'small',
@@ -220,7 +231,9 @@ export class DateInput extends React.Component<DateInputProps, DateInputState> {
       selected: this.isMouseDown && !prevState.focused ? prevState.selected : this.iDateMediator.getLeftmostType(),
     }));
 
-    this.props.onFocus?.(e);
+    if (this.props.onFocus) {
+      this.props.onFocus(e);
+    }
   };
 
   private handleBlur = (e: React.FocusEvent<HTMLElement>) => {

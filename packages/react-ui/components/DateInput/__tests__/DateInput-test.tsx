@@ -5,8 +5,8 @@ import { DefaultizeProps } from '../../../lib/utils';
 import { CHAR_MASK } from '../../../lib/date/constants';
 import { InternalDateOrder } from '../../../lib/date/types';
 import { DateInput, DateInputProps } from '../DateInput';
-import { LocaleContext, LocaleContextProps } from '../../Locale';
-import { defaultLangCode } from '../../Locale/constants';
+import { LocaleContext, LocaleContextProps } from '../../../lib/locale';
+import { defaultLangCode } from '../../../lib/locale/constants';
 
 interface LocaleDateInputProps {
   propsDateInput: DefaultizeProps<typeof DateInput, DateInputProps>;

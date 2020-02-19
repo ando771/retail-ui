@@ -1,5 +1,5 @@
-import { LangCodes } from '../../Locale';
-import { LocaleHelper } from '../../Locale/LocaleHelper';
+import { LangCodes } from '../../../lib/locale';
+import { LocaleHelper } from '../../../lib/locale/LocaleHelper';
 
 import  { componentsLocales as ru_RU } from './locales/ru';
 import { FiasLocale } from './types';

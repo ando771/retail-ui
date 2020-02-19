@@ -1,5 +1,5 @@
 import { internalDateLocale } from '../../../../lib/date/localeSets';
-import { LangCodes } from '../../../Locale';
+import { LangCodes } from '../../../../lib/locale';
 import { DatePickerLocale } from '../types';
 
 export const componentsLocales: DatePickerLocale = {

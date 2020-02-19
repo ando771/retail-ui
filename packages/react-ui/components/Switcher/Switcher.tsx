@@ -6,7 +6,8 @@ import { Group } from '../Group';
 import { Button, ButtonSize } from '../Button';
 import { Nullable } from '../../typings/utility-types';
 import { cx } from '../../lib/theming/Emotion';
-import { ThemeContext } from '../ThemeContext';
+import { ThemeContext } from '../../lib/theming/ThemeContext';
+import { Theme } from '../../lib/theming/Theme';
 
 import { jsStyles } from './Switcher.styles';
 import styles from './Switcher.module.less';
@@ -58,19 +59,28 @@ export class Switcher extends React.Component<SwitcherProps, SwitcherState> {
     value: PropTypes.string,
     onValueChange: PropTypes.func,
   };
-  public static contextType = ThemeContext;
-  public context!: React.ContextType<typeof ThemeContext>;
 
   public state: SwitcherState = {
     focusedIndex: null,
   };
 
+  private theme!: Theme;
 
   public render() {
-    const theme = this.context;
+    return (
+      <ThemeContext.Consumer>
+        {theme => {
+          this.theme = theme;
+          return this.renderMain();
+        }}
+      </ThemeContext.Consumer>
+    );
+  }
+
+  private renderMain() {
     const listClassNames = cx({
       [styles.error]: !!this.props.error,
-      [jsStyles.error(theme)]: !!this.props.error,
+      [jsStyles.error(this.theme)]: !!this.props.error,
     });
 
     const inputProps = {
