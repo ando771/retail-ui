@@ -1,8 +1,6 @@
+Принимает параметры  `value: Theme` `children: React.ReactNode`.
+
 Кастомизация компонентов с помощью библиотеки [`emotion`](https://github.com/emotion-js/emotion)
-
-
-
-Принимает в качестве пропов `children: React.ReactNode` и `value` типа `ThemeIn`:
 
 ```typescript
 import defaultThemeVariables from './components/variables.less';
@@ -17,12 +15,12 @@ interface ThemeIn extends ThemeInType {}
 В качестве базовой темы выступает объект, полученный из переменных `variables.less`. Объект, переданный в `value` будет смерджен с объектом базовой темой.
 
 Помимо базовой темы, есть плоская тема, собранная из переменных `variables.flat.less`.
-Объект плоской темы можно импортировать и передавать в ThemeProvider:
+Объект плоской темы можно импортировать и передавать в ThemeContext.Provider:
 
 ```jsx harmony
 import { ThemeContext } from '@skbkontur/react-ui';
 import { FLAT_THEME as flatTheme } from '@skbkontur/react-ui/lib/theming/themes/FlatTheme';
-import { ShowcaseGroup } from '@skbkontur/react-ui/components/internal/ThemeContextPlayground/ShowcaseGroup';
+import { ShowcaseGroup } from '@skbkontur/react-ui/components/internal/ThemePlayground/ShowcaseGroup';
 
 const FlatComponents = () => (
   <ThemeContext.Provider value={flatTheme}>
@@ -41,7 +39,7 @@ const FlatComponents = () => (
 ```jsx harmony
 import { ThemeContext } from '@skbkontur/react-ui';
 import { FLAT_THEME as flatTheme } from '@skbkontur/react-ui/lib/theming/themes/FlatTheme';
-import { ShowcaseGroup } from '@skbkontur/react-ui/components/internal/ThemeContextPlayground/ShowcaseGroup';
+import { ShowcaseGroup } from '@skbkontur/react-ui/components/internal/ThemePlayground/ShowcaseGroup';
 
 const CombinedComponents = () => (
   <>
@@ -64,8 +62,8 @@ const CombinedComponents = () => (
 import { ThemeContext } from '@skbkontur/react-ui';
 import { FLAT_THEME as flatTheme } from '@skbkontur/react-ui/lib/theming/themes/FlatTheme';
 import { DEFAULT_THEME as defaultTheme } from '@skbkontur/react-ui/lib/theming/themes/DefaultTheme';
-import { darkTheme } from '@skbkontur/react-ui/components/internal/ThemeContextPlayground/darkTheme';
-import { ShowcaseGroup } from '@skbkontur/react-ui/components/internal/ThemeContextPlayground/ShowcaseGroup';
+import { darkTheme } from '@skbkontur/react-ui/components/internal/ThemePlayground/darkTheme';
+import { ShowcaseGroup } from '@skbkontur/react-ui/components/internal/ThemePlayground/ShowcaseGroup';
 
 const wrapperStyles = {
   border: '1px solid rgb(188, 187, 187)',
@@ -137,7 +135,7 @@ export default {
 };
 ```
 
-Далее объект из theme.js можно передавать в ThemeProvider:
+Далее объект из theme.js можно передавать в ThemeContext.Provider:
 
 ```jsx static
 import ReactDOM from 'react-dom';

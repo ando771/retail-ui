@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 import { ThemeContext } from '../../../lib/theming/ThemeContext';
 import { Theme, ThemeIn } from '../../../lib/theming/Theme';
 import { ThemeFactory } from '../../../lib/theming/ThemeFactory';
-import { FLAT_THEME as flatThemeVariables } from '../../../lib/theming/themes/FlatTheme';
+import { FLAT_THEME as flatTheme } from '../../../lib/theming/themes/FlatTheme';
 import { SidePage } from '../../SidePage';
 import { Gapped } from '../../Gapped';
 import { ComboBox } from '../../ComboBox';
@@ -14,7 +14,7 @@ import styles from './styles.module.less';
 import { ThemeEditor } from './ThemeEditor';
 import { jsStyles } from './jsStyles';
 import { Playground } from './Playground';
-import { darkTheme as darkThemeVariables } from './darkTheme';
+import { darkTheme } from './darkTheme';
 import { ThemeType } from './constants';
 
 interface PlaygroundState {
@@ -65,8 +65,8 @@ export class ThemeContextPlayground extends React.Component<PlaygroundProps, Pla
       editorOpened: false,
       themes: {
         default: ThemeFactory.getDefaultTheme(),
-        dark: ThemeFactory.create(darkThemeVariables),
-        flat: ThemeFactory.create(flatThemeVariables),
+        dark: darkTheme,
+        flat: flatTheme,
       },
       themesErrors: {
         default: {},

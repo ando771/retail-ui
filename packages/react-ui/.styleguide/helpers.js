@@ -13,7 +13,6 @@ const { npmVersions, npmTags, publishVersion } = getPackageInfo();
 
 const excludedComponents = [
   'ThemeProvider',
-  'ThemeConsumer',
   'ThemeShowcase',
   'Locale',
   'LocaleProvider',
@@ -91,7 +90,7 @@ const getCommonSections = () => {
         { name: 'ThemeShowcase', content: path.join(__dirname, '../components/ThemeShowcase/ThemeShowcase.md') },
         {
           name: 'ThemePlayground',
-          content: path.join(__dirname, '../components/internal/ThemeContextPlayground/Playground.md'),
+          content: path.join(__dirname, '../components/internal/ThemePlayground/Playground.md'),
         },
       ],
     },
