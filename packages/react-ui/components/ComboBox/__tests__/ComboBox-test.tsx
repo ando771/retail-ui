@@ -1132,10 +1132,7 @@ describe('ComboBox', () => {
     it('render custom locale', async () => {
       const customText = 'custom notFound';
       wrapper = mount(
-        <LocaleContext.Provider value={{
-          langCode: defaultLangCode,
-          locale: { ComboBox: { notFound: customText } }
-        }}>
+        <LocaleContext.Provider value={{ locale: { ComboBox: { notFound: customText } }}}>
           <ComboBox getItems={search} />
         </LocaleContext.Provider>,
       );

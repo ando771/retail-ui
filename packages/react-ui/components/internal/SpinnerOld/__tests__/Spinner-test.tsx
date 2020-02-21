@@ -119,7 +119,7 @@ describe('SpinnerOld', () => {
 
     it('render default locale', () => {
       const wrapper = mount(
-        <LocaleContext.Provider value={{ langCode: defaultLangCode }}>
+        <LocaleContext.Provider value={{}}>
           <SpinnerOld />
         </LocaleContext.Provider>,
       );
@@ -156,7 +156,7 @@ describe('SpinnerOld', () => {
 
     it('updates when langCode changes', () => {
       const wrapper = mount(
-        <LocaleContext.Provider value={{ langCode: defaultLangCode }}>
+        <LocaleContext.Provider value={{}}>
           <SpinnerOld />
         </LocaleContext.Provider>,
       );

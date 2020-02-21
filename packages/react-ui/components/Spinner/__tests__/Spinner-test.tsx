@@ -93,7 +93,7 @@ describe('Spinner', () => {
 
     it('render default locale', () => {
       const wrapper = mount(
-        <LocaleContext.Provider value={{ langCode: defaultLangCode }}>
+        <LocaleContext.Provider value={{}}>
           <Spinner />
         </LocaleContext.Provider>,
       );
@@ -117,7 +117,6 @@ describe('Spinner', () => {
       const customText = 'custom loading';
       const wrapper = mount(
         <LocaleContext.Provider value={{
-          langCode: defaultLangCode,
           locale: { Spinner: { loading: customText }}
         }}
         >
@@ -130,7 +129,7 @@ describe('Spinner', () => {
 
     it('updates when langCode changes', () => {
       const wrapper = mount(
-        <LocaleContext.Provider value={{ langCode: defaultLangCode }}>
+        <LocaleContext.Provider value={{}}>
           <Spinner />
         </LocaleContext.Provider>,
       );

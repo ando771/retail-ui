@@ -14,10 +14,6 @@ export function locale<C>(controlName: keyof LocaleControls, localeHelper: Local
       public localeHelper: LocaleHelper<C> = localeHelper;
 
       public get locale(): C {
-        if (this.context === undefined) {
-          return {} as C;
-        }
-
         const localeFromContext = this.context.locale?.[this.controlName];
         return Object.assign({}, this.localeHelper.get(this.context.langCode), localeFromContext);
       }

@@ -71,7 +71,7 @@ describe('<TokenInput />', () => {
 
     it('render custom locale', async () => {
       const customComment = 'custom comment';
-      contextMount({ langCode: defaultLangCode, locale: { TokenInput: { addButtonComment: customComment } } });
+      contextMount({ locale: { TokenInput: { addButtonComment: customComment } } });
 
       await focus();
 

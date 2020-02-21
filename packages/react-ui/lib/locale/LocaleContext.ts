@@ -5,7 +5,7 @@ import { defaultLangCode } from './constants';
 
 export interface LocaleContextProps {
   locale?: LocaleControls;
-  langCode: LangCodes;
+  langCode?: LangCodes;
 }
 
 export const LocaleContext = React.createContext<LocaleContextProps>({

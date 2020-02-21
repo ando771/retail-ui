@@ -155,7 +155,6 @@ describe('DateInput as InputlikeText', () => {
         const onValueChange = jest.fn();
         const input = getInput(
           render({ onValueChange }, {
-            langCode: defaultLangCode,
             locale: { DatePicker: { order: order as InternalDateOrder } }
           }),
         );

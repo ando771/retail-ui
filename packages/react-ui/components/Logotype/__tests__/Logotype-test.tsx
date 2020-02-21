@@ -56,7 +56,6 @@ describe('Logotype', () => {
       wrapper = mount(
         <LocaleContext.Provider
           value={{
-            langCode: defaultLangCode,
             locale: { Logotype: { prefix: customPrefix } }
           }}
         >
@@ -73,7 +72,7 @@ describe('Logotype', () => {
 
     it('updates when langCode changes', () => {
       wrapper = mount(
-        <LocaleContext.Provider value={{ langCode: defaultLangCode }}>
+        <LocaleContext.Provider value={{}}>
           <Logotype />
         </LocaleContext.Provider>,
       );

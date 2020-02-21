@@ -73,7 +73,7 @@ describe('Select', () => {
 
     it('render default locale', () => {
       const wrapper = mount(
-        <LocaleContext.Provider value={{ langCode: defaultLangCode }}>
+        <LocaleContext.Provider value={{}}>
           <Select />
         </LocaleContext.Provider>,
       );
@@ -97,7 +97,6 @@ describe('Select', () => {
       const customPlaceholder = 'custom loading';
       const wrapper = mount(
         <LocaleContext.Provider value={{
-          langCode: defaultLangCode,
           locale: { Select: { placeholder: customPlaceholder }}
         }}
         >

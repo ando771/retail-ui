@@ -155,7 +155,7 @@ describe('Pager', () => {
     });
 
     it('render default locale', () => {
-      wrapper = mount(<LocaleContext.Provider value={{ langCode: defaultLangCode }}>{PagingContext()}</LocaleContext.Provider>);
+      wrapper = mount(<LocaleContext.Provider value={{}}>{PagingContext()}</LocaleContext.Provider>);
       const expectedText = PagingLocaleHelper.get(defaultLangCode).forward;
 
       expect(getForwardText()).toBe(expectedText);
@@ -172,7 +172,6 @@ describe('Pager', () => {
       const customPlaceholder = 'custom forward';
       wrapper = mount(
         <LocaleContext.Provider value={{
-          langCode: defaultLangCode,
           locale:{  Paging: { forward: customPlaceholder } }
         }}>{PagingContext()}</LocaleContext.Provider>,
       );

@@ -9,7 +9,6 @@ import { ThemeContext } from '../../lib/theming/ThemeContext';
 import { Theme } from '../../lib/theming/Theme';
 import { EditIcon } from '../internal/icons/16px';
 import { LocaleContext } from '../../lib/locale';
-import { defaultLangCode } from '../../lib/locale/constants';
 
 import { FiasLocale, FiasLocaleHelper } from './locale';
 import { APIProvider, ExtraFields, FiasValue, Fields, FieldsSettings, FormValidation } from './types';
@@ -235,7 +234,7 @@ export class Fias extends React.Component<FiasProps, FiasState> {
       ) : null;
 
     return (
-      <LocaleContext.Provider value={{ langCode: defaultLangCode, locale: { Fias: this.state.locale }}}>
+      <LocaleContext.Provider value={{ locale: { Fias: this.state.locale }}}>
         <div>
           {showAddressText && <span>{address.getFullText(this.isFieldVisible(ExtraFields.postalcode))}</span>}
           {!this.props.readonly && (

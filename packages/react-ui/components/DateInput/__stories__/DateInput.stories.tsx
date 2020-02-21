@@ -105,7 +105,6 @@ class DateInputDifferentFormatting extends React.Component<any, any> {
             </td>
             <td>
               <LocaleContext.Provider value={{
-                langCode: defaultLangCode,
                 locale: { DatePicker: { separator: InternalDateSeparator.Dot, order: InternalDateOrder.DMY } }
               }}>
                 <DateInput value={value} />
@@ -116,7 +115,6 @@ class DateInputDifferentFormatting extends React.Component<any, any> {
             <td>Dash</td>
             <td>
               <LocaleContext.Provider value={{
-                langCode: defaultLangCode,
                 locale: { DatePicker: { separator: InternalDateSeparator.Dash, order: InternalDateOrder.YMD } }
               }}
               >
@@ -125,7 +123,6 @@ class DateInputDifferentFormatting extends React.Component<any, any> {
             </td>
             <td>
               <LocaleContext.Provider value={{
-                langCode: defaultLangCode,
                 locale: { DatePicker: { separator: InternalDateSeparator.Dash, order: InternalDateOrder.MDY } }
               }}
               >
@@ -134,7 +131,6 @@ class DateInputDifferentFormatting extends React.Component<any, any> {
             </td>
             <td>
               <LocaleContext.Provider value={{
-                langCode: defaultLangCode,
                 locale: { DatePicker: { separator: InternalDateSeparator.Dash, order: InternalDateOrder.DMY } }
               }}>
                 <DateInput value={value} />
@@ -145,7 +141,6 @@ class DateInputDifferentFormatting extends React.Component<any, any> {
             <td>Slash</td>
             <td>
               <LocaleContext.Provider value={{
-                langCode: defaultLangCode,
                 locale: { DatePicker: { separator: InternalDateSeparator.Slash, order: InternalDateOrder.YMD } }
               }}
               >
@@ -154,18 +149,16 @@ class DateInputDifferentFormatting extends React.Component<any, any> {
             </td>
             <td>
               <LocaleContext.Provider value={{
-                langCode: defaultLangCode,
                 locale: { DatePicker: { separator: InternalDateSeparator.Slash, order: InternalDateOrder.MDY } }
-                }}
+              }}
               >
                 <DateInput value={value} />
               </LocaleContext.Provider>
             </td>
             <td>
-                <LocaleContext.Provider value={{
-                langCode: defaultLangCode,
+              <LocaleContext.Provider value={{
                 locale: { DatePicker: { separator: InternalDateSeparator.Slash, order: InternalDateOrder.DMY } }
-                }}
+              }}
               >
                 <DateInput value={value} />
               </LocaleContext.Provider>
@@ -174,17 +167,15 @@ class DateInputDifferentFormatting extends React.Component<any, any> {
           <tr>
             <td>Space</td>
             <td>
-                <LocaleContext.Provider value={{
-                  langCode: defaultLangCode,
-                  locale: { DatePicker: { separator: InternalDateSeparator.Space, order: InternalDateOrder.YMD } }
-                }}
+              <LocaleContext.Provider value={{
+                locale: { DatePicker: { separator: InternalDateSeparator.Space, order: InternalDateOrder.YMD } }
+              }}
               >
-                <DateInput value={value} />
+              <DateInput value={value} />
               </LocaleContext.Provider>
             </td>
             <td>
               <LocaleContext.Provider value={{
-                langCode: defaultLangCode,
                 locale: { DatePicker: { separator: InternalDateSeparator.Space, order: InternalDateOrder.MDY } }
               }}
               >
@@ -193,7 +184,6 @@ class DateInputDifferentFormatting extends React.Component<any, any> {
             </td>
             <td>
               <LocaleContext.Provider value={{
-                langCode: defaultLangCode,
                 locale: { DatePicker: { separator: InternalDateSeparator.Space, order: InternalDateOrder.DMY } }
               }}
               >
